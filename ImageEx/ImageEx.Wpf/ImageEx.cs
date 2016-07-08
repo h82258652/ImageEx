@@ -173,6 +173,30 @@ namespace Controls
             return bitmap;
         }
 
+        private Uri GetUriSource(string source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            Uri uri;
+            if (Uri.TryCreate(source, UriKind.RelativeOrAbsolute, out uri))
+            {
+                if (uri.IsAbsoluteUri == false)
+                {
+                    Uri.TryCreate("pack://application:,,,/" + (source.StartsWith("/") ? source.Substring(1) : source), UriKind.Absolute, out uri);
+                }
+            }
+
+            if (uri == null)
+            {
+                throw new NotSupportedException();
+            }
+
+            return uri;
+        }
+
         private async void SaveHttpSourceToCacheFolderAsync(string cacheFileName, byte[] bytes)
         {
             Directory.CreateDirectory(CacheFolderPath);
@@ -219,25 +243,14 @@ namespace Controls
                     }
                     else
                     {
-                        Uri uri;
-                        if (Uri.TryCreate(source, UriKind.RelativeOrAbsolute, out uri))
+                        var uri = GetUriSource(source);
+                        if (IsHttpUri(uri))
                         {
-                            if (IsHttpUri(uri))
-                            {
-                                bitmap = await GetHttpSourceAsync(uri);
-                            }
-                            else
-                            {
-                                if (uri.IsAbsoluteUri == false)
-                                {
-                                    Uri.TryCreate("pack://application:,,,/" + (source.StartsWith("/") ? source.Substring(1) : source), UriKind.Absolute, out uri);
-                                }
-                                bitmap = GetLocalSource(uri);
-                            }
+                            bitmap = await GetHttpSourceAsync(uri);
                         }
                         else
                         {
-                            throw new NotSupportedException();
+                            bitmap = GetLocalSource(uri);
                         }
 
                         if (bitmap != null)

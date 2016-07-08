@@ -103,6 +103,26 @@ namespace Controls
             return totalLength;
         }
 
+        public bool DeleteCache(string source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            var uri = GetUriSource(source);
+            var cacheFileName = GetCacheFileName(uri);
+            if (File.Exists(cacheFileName))
+            {
+                File.Delete(cacheFileName);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         private static bool IsHttpUri(Uri uri)
         {
             if (uri == null)
