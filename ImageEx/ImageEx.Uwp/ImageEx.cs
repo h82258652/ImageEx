@@ -1,6 +1,9 @@
-﻿using Windows.Media.Casting;
+﻿using System;
+using Windows.ApplicationModel;
+using Windows.Media.Casting;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Controls
 {
@@ -37,6 +40,28 @@ namespace Controls
             _image = (Image)GetTemplateChild(ImageTemplateName);
             _placeholderContentControl = (ContentControl)GetTemplateChild(PlaceholderContentControlTemplateName);
             SetSource(Source);
+        }
+
+        private void SetSource(string source)
+        {
+            if (_image != null && _placeholderContentControl != null)
+            {
+                // 设计模式下直接显示。
+                if (DesignMode.DesignModeEnabled)
+                {
+                    try
+                    {
+                        _image.Source = new BitmapImage(new Uri(Source));
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                    return;
+                }
+
+                throw new NotImplementedException();
+            }
         }
     }
 }

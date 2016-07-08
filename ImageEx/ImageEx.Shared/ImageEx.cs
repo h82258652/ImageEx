@@ -91,10 +91,5 @@ namespace Controls
 
             obj.SetSource(value);
         }
-
-        private void SetSource(string source)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
