@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Windows;
+using Weakly;
 
 #if WINDOWS_UWP
 
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 #else
 
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 #endif
 
@@ -90,6 +93,18 @@ namespace Controls
             var value = (string)e.NewValue;
 
             obj.SetSource(value);
+        }
+
+        private static readonly WeakValueDictionary<string, BitmapImage> CacheBitmapImages = new WeakValueDictionary<string, BitmapImage>();
+
+        private static bool IsHttpUri(Uri uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            return uri.IsAbsoluteUri && (uri.Scheme == "http" || uri.Scheme == "https");
         }
     }
 }
