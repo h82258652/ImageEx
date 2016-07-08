@@ -13,5 +13,15 @@ namespace Controls.Wpf.Demo
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            InitializeComponent();
+
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+        }
     }
 }

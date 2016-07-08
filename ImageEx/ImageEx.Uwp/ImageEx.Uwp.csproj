@@ -107,8 +107,10 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="ImageEx.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\HashHelper.cs" />
     <EmbeddedResource Include="Properties\ImageEx.Uwp.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +123,15 @@
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ImageEx.Core\ImageEx.Core.csproj">
+      <Project>{b65d1cfa-a7d4-43bd-8f71-74d01bb5b57c}</Project>
+      <Name>ImageEx.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\ImageEx.Shared\ImageEx.Shared.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

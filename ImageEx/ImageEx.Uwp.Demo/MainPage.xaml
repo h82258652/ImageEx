@@ -1,0 +1,43 @@
+﻿<Page x:Class="Controls.Uwp.Demo.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:controls="using:Controls"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="using:Controls.Uwp.Demo"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d">
+    <Page.Resources>
+        <DataTemplate x:Key="DownloadingTemplate">
+            <Border Background="DeepSkyBlue">
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Downloading" />
+            </Border>
+        </DataTemplate>
+    </Page.Resources>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Orientation="Vertical">
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              x:Name="Image"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="/Assets/Images/test.jpg" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="ms-appx:///Assets/Images/test.jpg" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="/Assets/Images/failed_image.png" />
+        </StackPanel>
+        <Button HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Content="Test"
+                Click="ButtonBase_OnClick"></Button>
+    </Grid>
+</Page>

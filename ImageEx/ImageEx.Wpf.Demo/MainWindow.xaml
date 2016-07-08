@@ -9,7 +9,37 @@
         Width="525"
         Height="350"
         mc:Ignorable="d">
+    <Window.Resources>
+        <DataTemplate x:Key="DownloadingTemplate">
+            <Border Background="DeepSkyBlue">
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="Downloading" />
+            </Border>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
-        <controls:ImageEx Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />
+        <StackPanel Orientation="Vertical">
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="C:\Users\h8225\Desktop\20160530104822111.jpg" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="/Assets/Images/test.jpg" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="pack://application:,,,/Assets/Images/test.jpg" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="/Assets/Images/failed_image.png" />
+        </StackPanel>
     </Grid>
 </Window>

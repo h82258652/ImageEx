@@ -96,10 +96,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Themes\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ImageEx.Wpf\ImageEx.Wpf.csproj">
-      <Project>{16258add-6472-4326-882b-c3c4c2804d35}</Project>
+      <Project>{531aee36-8c3d-4b65-99a5-97a27ec22413}</Project>
       <Name>ImageEx.Wpf</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\test.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\Images\failed_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

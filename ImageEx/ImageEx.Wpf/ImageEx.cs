@@ -1,5 +1,12 @@
-﻿using System;
+﻿using Controls.Core.Extensions;
+using Controls.Extensions;
+using Controls.Utils;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -10,10 +17,20 @@ namespace Controls
     {
         public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(nameof(StretchDirection), typeof(StretchDirection), typeof(ImageEx), new PropertyMetadata(StretchDirection.Both));
 
-        public ImageEx()
+        private const string CacheFolderName = "ImageExCache";
+
+        private static readonly string CacheFolderPath = Path.Combine(Path.GetTempPath(), CacheFolderName);
+
+        private static readonly Dictionary<Uri, Task<byte[]>> ImageDownloadTasks = new Dictionary<Uri, Task<byte[]>>();
+
+        static ImageEx()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageEx), new FrameworkPropertyMetadata(typeof(ImageEx)));
         }
+
+        public event EventHandler<ExceptionEventArgs> ImageFailed;
+
+        public event EventHandler ImageOpened;
 
         public StretchDirection StretchDirection
         {
@@ -36,17 +53,122 @@ namespace Controls
             SetSource(Source);
         }
 
-        private void SetHttpSource(Uri uri)
+        private static string GetCacheFileName(Uri uri)
         {
-            throw new NotImplementedException();
+            var originalString = uri.OriginalString;
+            var extension = Path.GetExtension(originalString);
+            var cacheFileName = HashHelper.GenerateMd5Hash(originalString) + extension;
+            return Path.Combine(CacheFolderPath, cacheFileName);
         }
 
-        private void SetLocalSource(Uri uri)
+        private async Task<BitmapImage> DownloadHttpSourceAsync(Uri uri, string cacheFileName)
         {
-            throw new NotImplementedException();
+            _image.Visibility = Visibility.Collapsed;
+            _placeholderContentControl.Visibility = Visibility.Visible;
+
+            Task<byte[]> task;
+            if (ImageDownloadTasks.TryGetValue(uri, out task) == false)
+            {
+                task = DownloadImageAsync(uri);
+                ImageDownloadTasks[uri] = task;
+            }
+            var bytes = await task;
+            ImageDownloadTasks.Remove(uri);
+
+            if (bytes == null)
+            {
+                return null;
+            }
+
+            BitmapImage bitmap;
+            try
+            {
+                bitmap = new BitmapImage();
+                bitmap.DecodeFailed += (sender, e) =>
+                {
+                    ImageFailed?.Invoke(this, new ExceptionEventArgs(e.ErrorException));
+                };
+                bitmap.BeginInit();
+                bitmap.StreamSource = new MemoryStream(bytes);
+                bitmap.EndInit();
+            }
+            catch (NotSupportedException ex)
+            {
+                bitmap = null;
+                ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
+            }
+
+            if (bitmap != null)
+            {
+                SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
+            }
+
+            return bitmap;
         }
 
-        private void SetSource(string source)
+        private async Task<byte[]> DownloadImageAsync(Uri uri)
+        {
+            using (var client = new HttpClient())
+            {
+                byte[] bytes;
+                try
+                {
+                    bytes = await client.GetByteArrayAsync(uri, new Progress<HttpProgress>(progress =>
+                    {
+                        // TODO
+                    }));
+                }
+                catch (HttpRequestException ex)
+                {
+                    bytes = null;
+                    ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
+                }
+                return bytes;
+            }
+        }
+
+        private async Task<BitmapImage> GetHttpSourceAsync(Uri uri)
+        {
+            var cacheFileName = GetCacheFileName(uri);
+            if (File.Exists(cacheFileName))
+            {
+                return GetLocalSource(new Uri(cacheFileName));
+            }
+            else
+            {
+                return await DownloadHttpSourceAsync(uri, cacheFileName);
+            }
+        }
+
+        private BitmapImage GetLocalSource(Uri uri)
+        {
+            BitmapImage bitmap;
+            try
+            {
+                bitmap = new BitmapImage();
+                bitmap.DecodeFailed += (sender, e) =>
+                {
+                    ImageFailed?.Invoke(this, new ExceptionEventArgs(e.ErrorException));
+                };
+                bitmap.BeginInit();
+                bitmap.UriSource = uri;
+                bitmap.EndInit();
+            }
+            catch (NotSupportedException ex)
+            {
+                bitmap = null;
+                ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
+            }
+            return bitmap;
+        }
+
+        private async void SaveHttpSourceToCacheFolderAsync(string cacheFileName, byte[] bytes)
+        {
+            Directory.CreateDirectory(CacheFolderPath);
+            await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
+        }
+
+        private async void SetSource(string source)
         {
             if (_image != null && _placeholderContentControl != null)
             {
@@ -55,7 +177,7 @@ namespace Controls
                 {
                     try
                     {
-                        _image.Source = new BitmapImage(new Uri(Source));
+                        _image.Source = new BitmapImage(new Uri(source));
                     }
                     catch (Exception)
                     {
@@ -84,7 +206,7 @@ namespace Controls
                         {
                             if (IsHttpUri(uri))
                             {
-                                SetHttpSource(uri);
+                                bitmap = await GetHttpSourceAsync(uri);
                             }
                             else
                             {
@@ -92,13 +214,31 @@ namespace Controls
                                 {
                                     Uri.TryCreate("pack://application:,,,/" + (source.StartsWith("/") ? source.Substring(1) : source), UriKind.Absolute, out uri);
                                 }
-                                SetLocalSource(uri);
+                                bitmap = GetLocalSource(uri);
                             }
                         }
                         else
                         {
                             throw new NotSupportedException();
                         }
+
+                        if (bitmap != null)
+                        {
+                            // 成功加载图片，放入缓存。
+                            CacheBitmapImages[source] = bitmap;
+                        }
+                    }
+
+                    if (source == Source)
+                    {
+                        if (bitmap != null)
+                        {
+                            ImageOpened?.Invoke(this, EventArgs.Empty);
+                        }
+
+                        _image.Visibility = Visibility.Visible;
+                        _placeholderContentControl.Visibility = Visibility.Collapsed;
+                        _image.Source = bitmap;
                     }
                 }
             }

@@ -11,4 +11,7 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ImageEx.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Extensions\" />
+  </ItemGroup>
 </Project>
