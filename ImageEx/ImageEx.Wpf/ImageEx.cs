@@ -154,6 +154,11 @@ namespace Controls
                 bitmap.UriSource = uri;
                 bitmap.EndInit();
             }
+            catch (FileNotFoundException ex)
+            {
+                bitmap = null;
+                ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
+            }
             catch (NotSupportedException ex)
             {
                 bitmap = null;
