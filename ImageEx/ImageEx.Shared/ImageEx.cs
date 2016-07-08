@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Weakly;
 
 #if WINDOWS_UWP
@@ -91,9 +92,15 @@ namespace Controls
             }
         }
 
-        public int CalculateCacheSize()
+        public long CalculateCacheSize()
         {
-            throw new NotImplementedException();
+            var totalLength = 0L;
+            foreach (var cacheFileName in Directory.EnumerateFiles(CacheFolderPath))
+            {
+                var info = new FileInfo(cacheFileName);
+                totalLength += info.Length;
+            }
+            return totalLength;
         }
 
         private static bool IsHttpUri(Uri uri)
