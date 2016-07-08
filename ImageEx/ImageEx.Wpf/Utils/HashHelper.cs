@@ -19,7 +19,7 @@ namespace Controls.Utils
                 var buffer = new StringBuilder();
                 foreach (var b in bytes)
                 {
-                    buffer.Append(b.ToString("X2"));
+                    buffer.Append(b.ToString("x2"));
                 }
                 return buffer.ToString();
             }

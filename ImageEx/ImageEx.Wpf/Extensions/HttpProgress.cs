@@ -1,6 +1,6 @@
 ﻿namespace Controls.Extensions
 {
-    public class HttpProgress
+    public struct HttpProgress
     {
         internal HttpProgress(int bytesReceived, int? totalBytesToReceive)
         {
