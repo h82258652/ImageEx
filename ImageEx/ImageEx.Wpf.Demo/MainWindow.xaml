@@ -27,6 +27,10 @@
             <controls:ImageEx Width="100"
                               Height="100"
                               PlaceholderTemplate="{StaticResource DownloadingTemplate}"
+                              Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />
+            <controls:ImageEx Width="100"
+                              Height="100"
+                              PlaceholderTemplate="{StaticResource DownloadingTemplate}"
                               Source="C:\Users\h8225\Desktop\20160530104822111.jpg" />
             <controls:ImageEx Width="100"
                               Height="100"

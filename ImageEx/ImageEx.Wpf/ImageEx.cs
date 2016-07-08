@@ -71,38 +71,45 @@ namespace Controls
                 task = DownloadImageAsync(uri);
                 ImageDownloadTasks[uri] = task;
             }
-            var bytes = await task;
-            ImageDownloadTasks.Remove(uri);
 
-            if (bytes == null)
-            {
-                return null;
-            }
-
-            BitmapImage bitmap;
             try
             {
-                bitmap = new BitmapImage();
-                bitmap.DecodeFailed += (sender, e) =>
+                var bytes = await task;
+
+                if (bytes == null)
                 {
-                    ImageFailed?.Invoke(this, new ExceptionEventArgs(e.ErrorException));
-                };
-                bitmap.BeginInit();
-                bitmap.StreamSource = new MemoryStream(bytes);
-                bitmap.EndInit();
-            }
-            catch (NotSupportedException ex)
-            {
-                bitmap = null;
-                ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
-            }
+                    return null;
+                }
 
-            if (bitmap != null)
-            {
-                SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
-            }
+                BitmapImage bitmap;
+                try
+                {
+                    bitmap = new BitmapImage();
+                    bitmap.DecodeFailed += (sender, e) =>
+                    {
+                        ImageFailed?.Invoke(this, new ExceptionEventArgs(e.ErrorException));
+                    };
+                    bitmap.BeginInit();
+                    bitmap.StreamSource = new MemoryStream(bytes);
+                    bitmap.EndInit();
+                }
+                catch (NotSupportedException ex)
+                {
+                    bitmap = null;
+                    ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
+                }
 
-            return bitmap;
+                if (bitmap != null)
+                {
+                    SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
+                }
+
+                return bitmap;
+            }
+            finally
+            {
+                ImageDownloadTasks.Remove(uri);
+            }
         }
 
         private async Task<byte[]> DownloadImageAsync(Uri uri)
@@ -169,7 +176,14 @@ namespace Controls
         private async void SaveHttpSourceToCacheFolderAsync(string cacheFileName, byte[] bytes)
         {
             Directory.CreateDirectory(CacheFolderPath);
-            await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
+            try
+            {
+                await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         private async void SetSource(string source)

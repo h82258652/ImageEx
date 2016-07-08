@@ -71,26 +71,33 @@ namespace Controls
                 task = DownloadImageAsync(uri);
                 ImageDownloadTasks[uri] = task;
             }
-            var bytes = await task;
-            ImageDownloadTasks.Remove(uri);
 
-            if (bytes == null)
+            try
             {
-                return null;
+                var bytes = await task;
+
+                if (bytes == null)
+                {
+                    return null;
+                }
+
+                var bitmap = new BitmapImage();
+                bitmap.ImageFailed += (sender, e) =>
+                {
+                    ImageFailed?.Invoke(this, new ExceptionEventArgs(e.ErrorMessage));
+                };
+                bitmap.ImageOpened += (sender, e) =>
+                {
+                    SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
+                };
+                await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
+
+                return bitmap;
             }
-
-            var bitmap = new BitmapImage();
-            bitmap.ImageFailed += (sender, e) =>
+            finally
             {
-                ImageFailed?.Invoke(this, new ExceptionEventArgs(e.ErrorMessage));
-            };
-            bitmap.ImageOpened += (sender, e) =>
-            {
-                SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
-            };
-            await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
-
-            return bitmap;
+                ImageDownloadTasks.Remove(uri);
+            }
         }
 
         private async Task<byte[]> DownloadImageAsync(Uri uri)
@@ -152,7 +159,14 @@ namespace Controls
         private async void SaveHttpSourceToCacheFolderAsync(string cacheFileName, byte[] bytes)
         {
             Directory.CreateDirectory(CacheFolderPath);
-            await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
+            try
+            {
+                await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
         private async void SetSource(string source)
