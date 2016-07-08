@@ -31,9 +31,13 @@ namespace Controls
 
         public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(nameof(Stretch), typeof(Stretch), typeof(ImageEx), new PropertyMetadata(Stretch.Uniform));
 
+        private const string CacheFolderName = "ImageExCache";
+
         private const string ImageTemplateName = "PART_Image";
 
         private const string PlaceholderContentControlTemplateName = "PART_PlaceholderContentControl";
+
+        private static readonly WeakValueDictionary<string, BitmapImage> CacheBitmapImages = new WeakValueDictionary<string, BitmapImage>();
 
         private Image _image;
 
@@ -87,16 +91,6 @@ namespace Controls
             }
         }
 
-        private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var obj = (ImageEx)d;
-            var value = (string)e.NewValue;
-
-            obj.SetSource(value);
-        }
-
-        private static readonly WeakValueDictionary<string, BitmapImage> CacheBitmapImages = new WeakValueDictionary<string, BitmapImage>();
-
         private static bool IsHttpUri(Uri uri)
         {
             if (uri == null)
@@ -105,6 +99,14 @@ namespace Controls
             }
 
             return uri.IsAbsoluteUri && (uri.Scheme == "http" || uri.Scheme == "https");
+        }
+
+        private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var obj = (ImageEx)d;
+            var value = (string)e.NewValue;
+
+            obj.SetSource(value);
         }
     }
 }

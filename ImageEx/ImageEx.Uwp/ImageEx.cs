@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Media.Casting;
 using Windows.Storage;
-using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Imaging;
@@ -20,8 +19,6 @@ namespace Controls
     {
         public static readonly DependencyProperty NineGridProperty = DependencyProperty.Register(nameof(NineGrid), typeof(Thickness), typeof(ImageEx), new PropertyMetadata(default(Thickness)));
 
-        private const string CacheFolderName = "ImageExCache";
-
         private static readonly string CacheFolderPath = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, CacheFolderName);
 
         private static readonly Dictionary<Uri, Task<byte[]>> ImageDownloadTasks = new Dictionary<Uri, Task<byte[]>>();
@@ -30,6 +27,8 @@ namespace Controls
         {
             DefaultStyleKey = typeof(ImageEx);
         }
+
+        public event EventHandler<HttpDownloadProgressEventArgs> DownloadProgressChanged;
 
         public event EventHandler<ExceptionEventArgs> ImageFailed;
 
@@ -102,12 +101,9 @@ namespace Controls
                 try
                 {
                     var task = client.GetBufferAsync(uri);
-                    task.Progress = async (info, progressInfo) =>
+                    task.Progress = (info, progressInfo) =>
                     {
-                        await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-                        {
-                            // TODO
-                        });
+                        DownloadProgressChanged?.Invoke(this, new HttpDownloadProgressEventArgs(progressInfo));
                     };
                     var buffer = await task;
                     bytes = buffer.ToArray();

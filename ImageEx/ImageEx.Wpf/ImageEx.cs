@@ -17,8 +17,6 @@ namespace Controls
     {
         public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(nameof(StretchDirection), typeof(StretchDirection), typeof(ImageEx), new PropertyMetadata(StretchDirection.Both));
 
-        private const string CacheFolderName = "ImageExCache";
-
         private static readonly string CacheFolderPath = Path.Combine(Path.GetTempPath(), CacheFolderName);
 
         private static readonly Dictionary<Uri, Task<byte[]>> ImageDownloadTasks = new Dictionary<Uri, Task<byte[]>>();
@@ -27,6 +25,8 @@ namespace Controls
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageEx), new FrameworkPropertyMetadata(typeof(ImageEx)));
         }
+
+        public event EventHandler<HttpDownloadProgressEventArgs> DownloadProgressChanged;
 
         public event EventHandler<ExceptionEventArgs> ImageFailed;
 
@@ -115,7 +115,7 @@ namespace Controls
                 {
                     bytes = await client.GetByteArrayAsync(uri, new Progress<HttpProgress>(progress =>
                     {
-                        // TODO
+                        DownloadProgressChanged?.Invoke(this, new HttpDownloadProgressEventArgs(progress));
                     }));
                 }
                 catch (HttpRequestException ex)
