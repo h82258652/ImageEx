@@ -103,6 +103,11 @@ namespace Controls
             return totalLength;
         }
 
+        public void DeleteAllCache()
+        {
+            Directory.Delete(CacheFolderPath, true);
+        }
+
         public bool DeleteCache(string source)
         {
             if (source == null)
