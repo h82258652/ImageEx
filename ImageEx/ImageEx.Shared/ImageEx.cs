@@ -91,6 +91,11 @@ namespace Controls
             }
         }
 
+        public int CalculateCacheSize()
+        {
+            throw new NotImplementedException();
+        }
+
         private static bool IsHttpUri(Uri uri)
         {
             if (uri == null)
