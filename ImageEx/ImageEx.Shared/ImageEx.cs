@@ -34,6 +34,8 @@ namespace Controls
 
         private Image _image;
 
+        private ContentControl _placeholderContentControl;
+
         public DataTemplate PlaceholderTemplate
         {
             get
@@ -83,6 +85,14 @@ namespace Controls
         }
 
         private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var obj = (ImageEx)d;
+            var value = (string)e.NewValue;
+
+            obj.SetSource(value);
+        }
+
+        private void SetSource(string source)
         {
             throw new NotImplementedException();
         }

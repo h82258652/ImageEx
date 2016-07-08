@@ -35,6 +35,8 @@ namespace Controls
             base.OnApplyTemplate();
 
             _image = (Image)GetTemplateChild(ImageTemplateName);
+            _placeholderContentControl = (ContentControl)GetTemplateChild(PlaceholderContentControlTemplateName);
+            SetSource(Source);
         }
     }
 }
