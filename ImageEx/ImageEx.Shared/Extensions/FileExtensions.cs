@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Controls.Core.Extensions
+namespace Controls.Extensions
 {
     public static class FileExtensions
     {

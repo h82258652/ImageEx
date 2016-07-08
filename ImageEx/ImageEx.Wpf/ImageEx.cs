@@ -1,5 +1,4 @@
-﻿using Controls.Core.Extensions;
-using Controls.Extensions;
+﻿using Controls.Extensions;
 using Controls.Utils;
 using System;
 using System.Collections.Generic;

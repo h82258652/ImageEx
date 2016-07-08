@@ -9,6 +9,7 @@
     <Import_RootNamespace>Controls</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\FileExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HttpDownloadProgressEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ImageEx.cs" />
   </ItemGroup>
