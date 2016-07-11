@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Weakly;
 
 #if WINDOWS_UWP
@@ -94,13 +95,8 @@ namespace Controls
 
         public long CalculateCacheSize()
         {
-            var totalLength = 0L;
-            foreach (var cacheFileName in Directory.EnumerateFiles(CacheFolderPath))
-            {
-                var info = new FileInfo(cacheFileName);
-                totalLength += info.Length;
-            }
-            return totalLength;
+            return (from cacheFileName in Directory.EnumerateFiles(CacheFolderPath)
+                    select new FileInfo(cacheFileName).Length).Sum();
         }
 
         public void DeleteAllCache()
