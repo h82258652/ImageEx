@@ -22,6 +22,7 @@
         <StackPanel Orientation="Vertical">
             <controls:ImageEx Width="100"
                               Height="100"
+                              x:Name="Image"
                               PlaceholderTemplate="{StaticResource DownloadingTemplate}"
                               Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />
             <controls:ImageEx Width="100"
@@ -49,5 +50,9 @@
                               PlaceholderTemplate="{StaticResource DownloadingTemplate}"
                               Source="/Assets/Images/failed_image.png" />
         </StackPanel>
+        <Button Content="Test"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Click="ButtonBase_OnClick"></Button>
     </Grid>
 </Window>
