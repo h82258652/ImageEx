@@ -243,16 +243,15 @@ namespace Controls
                         }
                     }
 
-                    if (source == Source)
+                    if (source == Source)// 确保在执行异步操作过程中，Source 没有变动。
                     {
+                        _image.Visibility = Visibility.Visible;
+                        _placeholderContentControl.Visibility = Visibility.Collapsed;
+                        _image.Source = bitmap;
                         if (bitmap != null)
                         {
                             ImageOpened?.Invoke(this, EventArgs.Empty);
                         }
-
-                        _image.Visibility = Visibility.Visible;
-                        _placeholderContentControl.Visibility = Visibility.Collapsed;
-                        _image.Source = bitmap;
                     }
                 }
             }
