@@ -1,4 +1,6 @@
-﻿#if WINDOWS_UWP
+﻿using System;
+
+#if WINDOWS_UWP
 
 using Windows.Web.Http;
 
@@ -10,7 +12,7 @@ using Controls.Extensions;
 
 namespace Controls
 {
-    public class HttpDownloadProgressEventArgs
+    public class HttpDownloadProgressEventArgs : EventArgs
     {
         public HttpDownloadProgressEventArgs(HttpProgress progress)
         {
