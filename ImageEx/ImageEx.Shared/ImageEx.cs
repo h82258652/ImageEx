@@ -99,6 +99,18 @@ namespace Controls
                     select new FileInfo(cacheFileName).Length).Sum();
         }
 
+        public static bool ContainsCache(string source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            var uri = GetUriSource(source);
+            var cacheFileName = GetCacheFileName(uri);
+            return File.Exists(cacheFileName);
+        }
+
         public static void DeleteAllCache()
         {
             Directory.Delete(CacheFolderPath, true);
