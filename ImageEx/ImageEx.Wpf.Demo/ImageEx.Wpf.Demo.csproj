@@ -95,9 +95,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Themes\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\ImageEx.Wpf\ImageEx.Wpf.csproj">
       <Project>{531aee36-8c3d-4b65-99a5-97a27ec22413}</Project>
