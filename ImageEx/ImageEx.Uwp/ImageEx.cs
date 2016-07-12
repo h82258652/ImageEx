@@ -124,7 +124,7 @@ namespace Controls
             }
         }
 
-        private string GetCacheFileName(Uri uri)
+        private static string GetCacheFileName(Uri uri)
         {
             var originalString = uri.OriginalString;
             var extension = Path.GetExtension(originalString);
@@ -156,7 +156,7 @@ namespace Controls
             return bitmap;
         }
 
-        private Uri GetUriSource(string source)
+        private static Uri GetUriSource(string source)
         {
             if (source == null)
             {

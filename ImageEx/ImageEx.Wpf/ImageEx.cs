@@ -173,7 +173,7 @@ namespace Controls
             return bitmap;
         }
 
-        private Uri GetUriSource(string source)
+        private static Uri GetUriSource(string source)
         {
             if (source == null)
             {

@@ -93,18 +93,18 @@ namespace Controls
             }
         }
 
-        public long CalculateCacheSize()
+        public static long CalculateCacheSize()
         {
             return (from cacheFileName in Directory.EnumerateFiles(CacheFolderPath)
                     select new FileInfo(cacheFileName).Length).Sum();
         }
 
-        public void DeleteAllCache()
+        public static void DeleteAllCache()
         {
             Directory.Delete(CacheFolderPath, true);
         }
 
-        public bool DeleteCache(string source)
+        public static bool DeleteCache(string source)
         {
             if (source == null)
             {
