@@ -143,7 +143,8 @@ namespace Controls
                 throw new ArgumentNullException(nameof(uri));
             }
 
-            return uri.IsAbsoluteUri && (uri.Scheme == "http" || uri.Scheme == "https");
+            var scheme = uri.Scheme;
+            return uri.IsAbsoluteUri && (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase) || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase));
         }
 
         private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
