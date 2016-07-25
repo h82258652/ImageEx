@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Controls.Extensions;
 using Weakly;
 
 #if WINDOWS_UWP
@@ -153,6 +155,31 @@ namespace Controls
             var value = (string)e.NewValue;
 
             obj.SetSource(value);
+        }
+
+        public static async Task<byte[]> GetBytesAsync(Uri uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            if (IsHttpUri(uri))
+            {
+                var cacheFileName = GetCacheFileName(uri);
+                if (File.Exists(cacheFileName))
+                {
+                    return await FileExtensions.ReadAllBytesAsync(cacheFileName);
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
