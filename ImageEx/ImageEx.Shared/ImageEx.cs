@@ -178,7 +178,8 @@ namespace Controls
             }
             else
             {
-                throw new NotImplementedException();
+                var path = uri.OriginalString;
+                return await FileExtensions.ReadAllBytesAsync(path);
             }
         }
     }
