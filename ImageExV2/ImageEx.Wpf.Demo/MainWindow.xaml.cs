@@ -29,12 +29,12 @@ namespace ImageEx.Wpf.Demo
 
         private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var bitmap = await DefaultImageLoader.Instance.GetBytesAsync("https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png");
-            var b = new BitmapImage();
-            b.BeginInit();
-            b.StreamSource = new MemoryStream(bitmap);
-            b.EndInit();
-            Image.Source = b;
+            var bitmap = await DefaultImageLoader.Instance.GetBitmapAsync(@"C:\Users\h8225\Desktop\failed_image.png");
+            //var b = new BitmapImage();
+            //b.BeginInit();
+            //b.StreamSource = new MemoryStream(bitmap);
+            //b.EndInit();
+            Image.Source = bitmap;
         }
     }
 }
