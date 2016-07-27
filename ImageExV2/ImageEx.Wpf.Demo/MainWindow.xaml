@@ -14,7 +14,7 @@
                     Orientation="Vertical">
             <controls:ImageEx Width="100"
                               Height="100"
-                              Source="https://www.nuget.org/packages/Weakly1/" />
+                              Source="test.jpg" />
             <controls:ImageEx Width="100"
                               Height="100"
                               Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />

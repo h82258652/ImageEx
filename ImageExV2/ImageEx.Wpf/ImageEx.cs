@@ -150,14 +150,7 @@ namespace Controls
                 // 设计模式下直接显示。
                 if ((bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue)
                 {
-                    try
-                    {
-                        _image.Source = new BitmapImage(new Uri(source));
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
-                    }
+                    _image.Source = new BitmapImage(new Uri(source, UriKind.RelativeOrAbsolute));
                 }
                 else
                 {
