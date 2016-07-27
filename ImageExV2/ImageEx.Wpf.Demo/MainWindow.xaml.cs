@@ -27,14 +27,14 @@ namespace ImageEx.Wpf.Demo
             InitializeComponent();
         }
 
-        private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
         {
-            var bitmap = await DefaultImageLoader.Instance.GetBitmapAsync(@"C:\Users\h8225\Desktop\failed_image.png");
+            //var bitmap = await DefaultImageLoader.Instance.GetBytesAsync(@"C:\Users\h8225\Desktop\failed_image.png");
             //var b = new BitmapImage();
             //b.BeginInit();
             //b.StreamSource = new MemoryStream(bitmap);
             //b.EndInit();
-            Image.Source = bitmap;
+            //Image.Source = b;
         }
     }
 }
