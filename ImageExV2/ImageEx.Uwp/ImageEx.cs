@@ -1,9 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
+using Windows.ApplicationModel;
+using Windows.Media.Casting;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Controls
 {
@@ -11,13 +13,13 @@ namespace Controls
     [TemplatePart(Name = PlaceholderContentControlTemplateName, Type = typeof(ContentControl))]
     public class ImageEx : Control
     {
+        public static readonly DependencyProperty NineGridProperty = DependencyProperty.Register(nameof(NineGrid), typeof(Thickness), typeof(ImageEx), new PropertyMetadata(default(Thickness)));
+
         public static readonly DependencyProperty PlaceholderTemplateProperty = DependencyProperty.Register(nameof(PlaceholderTemplate), typeof(DataTemplate), typeof(ImageEx), new PropertyMetadata(null));
 
         public static readonly DependencyProperty PlaceholderTemplateSelectorProperty = DependencyProperty.Register(nameof(PlaceholderTemplateSelector), typeof(DataTemplateSelector), typeof(ImageEx), new PropertyMetadata(null));
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(nameof(Source), typeof(string), typeof(ImageEx), new PropertyMetadata(null, SourceChanged));
-
-        public static readonly DependencyProperty StretchDirectionProperty = DependencyProperty.Register(nameof(StretchDirection), typeof(StretchDirection), typeof(ImageEx), new PropertyMetadata(StretchDirection.Both));
 
         public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(nameof(Stretch), typeof(Stretch), typeof(ImageEx), new PropertyMetadata(Stretch.Uniform));
 
@@ -31,9 +33,9 @@ namespace Controls
 
         private ContentControl _placeholderContentControl;
 
-        static ImageEx()
+        public ImageEx()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ImageEx), new FrameworkPropertyMetadata(typeof(ImageEx)));
+            DefaultStyleKey = typeof(ImageEx);
         }
 
         public event EventHandler<HttpDownloadProgressEventArgs> DownloadProgressChanged;
@@ -47,11 +49,17 @@ namespace Controls
                 if (_loader == null)
                 {
                     _loader = DefaultImageLoader.Instance;
-                    _loader.DownloadProgressChanged += (sender, e) =>
+                    _loader.DownloadProgressChanged += async (sender, e) =>
                     {
-                        if (e.Url == Source)
+                        if (DownloadProgressChanged != null)
                         {
-                            DownloadProgressChanged?.Invoke(this, e);
+                            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                            {
+                                if (e.Url == Source)
+                                {
+                                    DownloadProgressChanged?.Invoke(this, e);
+                                }
+                            });
                         }
                     };
                     _loader.ImageFailed += (sender, e) =>
@@ -63,6 +71,18 @@ namespace Controls
                     };
                 }
                 return _loader;
+            }
+        }
+
+        public Thickness NineGrid
+        {
+            get
+            {
+                return (Thickness)GetValue(NineGridProperty);
+            }
+            set
+            {
+                SetValue(NineGridProperty, value);
             }
         }
 
@@ -114,19 +134,13 @@ namespace Controls
             }
         }
 
-        public StretchDirection StretchDirection
+        public CastingSource GetAsCastingSource()
         {
-            get
-            {
-                return (StretchDirection)GetValue(StretchDirectionProperty);
-            }
-            set
-            {
-                SetValue(StretchDirectionProperty, value);
-            }
+            ApplyTemplate();
+            return _image?.GetAsCastingSource();
         }
 
-        public override void OnApplyTemplate()
+        protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
@@ -148,7 +162,7 @@ namespace Controls
             if (_image != null && _placeholderContentControl != null)
             {
                 // 设计模式下直接显示。
-                if ((bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue)
+                if (DesignMode.DesignModeEnabled)
                 {
                     try
                     {

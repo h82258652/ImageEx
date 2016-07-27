@@ -60,6 +60,30 @@ namespace Controls
             return Path.Combine(CacheFolderPath, cacheFileName);
         }
 
+        private static Uri GetUriSource(string source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            Uri uri;
+            if (Uri.TryCreate(source, UriKind.RelativeOrAbsolute, out uri))
+            {
+                if (uri.IsAbsoluteUri == false)
+                {
+                    Uri.TryCreate("pack://application:,,,/" + (source.StartsWith("/") ? source.Substring(1) : source), UriKind.Absolute, out uri);
+                }
+            }
+
+            if (uri == null)
+            {
+                throw new NotSupportedException();
+            }
+
+            return uri;
+        }
+
         private async Task<BitmapImage> DownloadHttpSourceAsync(Uri uri, string cacheFileName)
         {
             _image.Visibility = Visibility.Collapsed;
@@ -171,43 +195,6 @@ namespace Controls
                 ImageFailed?.Invoke(this, new ExceptionEventArgs(ex));
             }
             return bitmap;
-        }
-
-        private static Uri GetUriSource(string source)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            Uri uri;
-            if (Uri.TryCreate(source, UriKind.RelativeOrAbsolute, out uri))
-            {
-                if (uri.IsAbsoluteUri == false)
-                {
-                    Uri.TryCreate("pack://application:,,,/" + (source.StartsWith("/") ? source.Substring(1) : source), UriKind.Absolute, out uri);
-                }
-            }
-
-            if (uri == null)
-            {
-                throw new NotSupportedException();
-            }
-
-            return uri;
-        }
-
-        private async void SaveHttpSourceToCacheFolderAsync(string cacheFileName, byte[] bytes)
-        {
-            Directory.CreateDirectory(CacheFolderPath);
-            try
-            {
-                await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
         }
 
         private async void SetSource(string source)

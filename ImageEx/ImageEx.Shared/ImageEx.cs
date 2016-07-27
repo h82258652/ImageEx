@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Controls.Extensions;
 using Weakly;
@@ -138,25 +139,6 @@ namespace Controls
             }
         }
 
-        private static bool IsHttpUri(Uri uri)
-        {
-            if (uri == null)
-            {
-                throw new ArgumentNullException(nameof(uri));
-            }
-
-            var scheme = uri.Scheme;
-            return uri.IsAbsoluteUri && (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase) || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase));
-        }
-
-        private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var obj = (ImageEx)d;
-            var value = (string)e.NewValue;
-
-            obj.SetSource(value);
-        }
-
         public static async Task<byte[]> GetBytesAsync(Uri uri)
         {
             if (uri == null)
@@ -173,7 +155,44 @@ namespace Controls
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    Task<byte[]> task;
+                    if (ImageDownloadTasks.TryGetValue(uri, out task) == false)
+                    {
+                        task = Task.Run(() =>
+                        {
+                            using (var client = new HttpClient())
+                            {
+                                return client.GetByteArrayAsync(uri);
+                            }
+                        });
+                        ImageDownloadTasks[uri] = task;
+                    }
+
+                    try
+                    {
+                        var bytes = await task;
+
+                        var bitmap = new BitmapImage();
+#if WINDOWS_UWP
+                    bitmap.ImageOpened += (sender, e) =>
+                    {
+                        SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
+                    };
+                    await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
+#else
+                        bitmap.BeginInit();
+                        bitmap.StreamSource = new MemoryStream(bytes);
+                        bitmap.EndInit();
+
+                        SaveHttpSourceToCacheFolderAsync(cacheFileName, bytes);
+#endif
+
+                        return bytes;
+                    }
+                    finally
+                    {
+                        ImageDownloadTasks.Remove(uri);
+                    }
                 }
             }
             else
@@ -181,6 +200,38 @@ namespace Controls
                 var path = uri.OriginalString;
                 return await FileExtensions.ReadAllBytesAsync(path);
             }
+        }
+
+        private static bool IsHttpUri(Uri uri)
+        {
+            if (uri == null)
+            {
+                throw new ArgumentNullException(nameof(uri));
+            }
+
+            var scheme = uri.Scheme;
+            return uri.IsAbsoluteUri && (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase) || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static async void SaveHttpSourceToCacheFolderAsync(string cacheFileName, byte[] bytes)
+        {
+            Directory.CreateDirectory(CacheFolderPath);
+            try
+            {
+                await FileExtensions.WriteAllBytesAsync(cacheFileName, bytes);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
+        private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var obj = (ImageEx)d;
+            var value = (string)e.NewValue;
+
+            obj.SetSource(value);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -19,7 +20,7 @@ namespace Controls.Utils
                 var buffer = new StringBuilder();
                 foreach (var b in bytes)
                 {
-                    buffer.Append(b.ToString("x2"));
+                    buffer.Append(b.ToString("x2", CultureInfo.InvariantCulture));
                 }
                 return buffer.ToString();
             }

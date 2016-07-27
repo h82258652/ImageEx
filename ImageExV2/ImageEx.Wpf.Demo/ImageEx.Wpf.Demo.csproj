@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{25364B1A-1251-43DB-AA9E-879AB22BDD7C}</ProjectGuid>
+    <ProjectGuid>{77A81A4A-366F-46D4-B528-9E88E30CBE64}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Controls.Wpf.Demo</RootNamespace>
+    <RootNamespace>ImageEx.Wpf.Demo</RootNamespace>
     <AssemblyName>ImageEx.Wpf.Demo</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -97,9 +97,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ImageEx.Wpf\ImageEx.Wpf.csproj">
-      <Project>{b3333021-fafb-43d7-bf69-226eb4a9ac66}</Project>
+      <Project>{6a03d9b1-a26e-46d7-8450-cfd886e8c8c7}</Project>
       <Name>ImageEx.Wpf</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="test.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

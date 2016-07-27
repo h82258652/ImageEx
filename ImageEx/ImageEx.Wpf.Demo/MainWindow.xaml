@@ -19,9 +19,22 @@
         </DataTemplate>
     </Window.Resources>
     <Grid>
+        <Image x:Name="RR"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               Stretch="None"></Image>
         <StackPanel Orientation="Vertical">
+            <Image Width="100"
+                   Height="100"
+                   x:Name="Tf">
+                <Image.Source>
+                    <BitmapImage DownloadCompleted="BitmapSource_OnDownloadCompleted"
+                                 UriSource="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png"></BitmapImage>
+                </Image.Source>
+            </Image>
             <controls:ImageEx Width="100"
                               Height="100"
+                              ImageOpened="Image_OnImageOpened"
                               x:Name="Image"
                               PlaceholderTemplate="{StaticResource DownloadingTemplate}"
                               Source="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" />
