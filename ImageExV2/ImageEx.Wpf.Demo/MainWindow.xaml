@@ -21,6 +21,11 @@
             <controls:ImageEx Width="100"
                               Height="100"
                               Source="test.jpg" />
+            <Image x:Name="Image"
+                   Width="100"
+                   Height="100"></Image>
+            <Button Content="Test"
+                    Click="ButtonBase_OnClick"></Button>
         </StackPanel>
     </Grid>
 </Window>
