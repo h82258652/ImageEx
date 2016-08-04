@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Windows.UI.Xaml.Media.Imaging;
 
 namespace Controls.Uwp
 {
@@ -13,7 +12,7 @@ namespace Controls.Uwp
 
         bool DeleteCache(string source);
 
-        Task<BitmapImage> GetBitmapAsync(string source);
+        Task<BitmapResult> GetBitmapAsync(string source);
 
         Task<byte[]> GetBytesAsync(string source);
     }

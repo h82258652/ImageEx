@@ -1,16 +1,22 @@
-﻿using System;
-using Windows.UI.Xaml.Media.Imaging;
+﻿using Windows.UI.Xaml.Media.Imaging;
 
 namespace Controls.Uwp
 {
     public class BitmapResult
     {
-        public BitmapStatus Status
+        internal BitmapResult(BitmapImage bitmap)
         {
-            get;
+            Result = bitmap;
+            Status = BitmapStatus.Opened;
         }
 
-        public Exception FailedException
+        internal BitmapResult(string errorMessage)
+        {
+            ErrorMessage = errorMessage;
+            Status = BitmapStatus.Failed;
+        }
+
+        public string ErrorMessage
         {
             get;
         }
@@ -18,6 +24,16 @@ namespace Controls.Uwp
         public BitmapImage Result
         {
             get;
+        }
+
+        public BitmapStatus Status
+        {
+            get;
+        }
+
+        public static implicit operator BitmapImage(BitmapResult result)
+        {
+            return result.Result;
         }
     }
 }

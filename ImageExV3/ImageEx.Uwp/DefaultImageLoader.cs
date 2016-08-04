@@ -13,11 +13,23 @@ using Windows.Web.Http;
 
 namespace Controls.Uwp
 {
-    public class DefaultImageLoader : IImageLoader
+    public sealed class DefaultImageLoader : IImageLoader
     {
+        private const string CacheFolderName = "ImageEx";
+
         private static readonly WeakValueDictionary<string, BitmapImage> CacheBitmapImages = new WeakValueDictionary<string, BitmapImage>();
 
-        private const string CacheFolderName = "ImageEx";
+        private static readonly string CacheFolderPath = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path,
+            CacheFolderName);
+
+        private DefaultImageLoader()
+        {
+        }
+
+        public static IImageLoader Instance
+        {
+            get;
+        } = new DefaultImageLoader();
 
         public long CalculateCacheSize()
         {
@@ -62,7 +74,7 @@ namespace Controls.Uwp
             }
         }
 
-        public async Task<BitmapImage> GetBitmapAsync(string source)
+        public async Task<BitmapResult> GetBitmapAsync(string source)
         {
             if (source == null)
             {
@@ -74,18 +86,46 @@ namespace Controls.Uwp
             if (CacheBitmapImages.TryGetValue(source, out bitmap))
             {
                 // 内存缓存存在，直接使用内存缓存。
-                return bitmap;
+                return new BitmapResult(bitmap);
             }
             else
             {
                 var uriSource = ToUriSource(source);
                 if (IsHttpUri(uriSource))
                 {
-                    // TODO
+                    var cacheFilePath = GetCacheFilePath(uriSource);
+                    if (File.Exists(cacheFilePath))
+                    {
+                        TaskCompletionSource<BitmapResult> tcs = new TaskCompletionSource<BitmapResult>();
+                        bitmap = new BitmapImage();
+                        RoutedEventHandler imageOpenedHandler = null;
+                        imageOpenedHandler = (sender, e) =>
+                        {
+                            bitmap.ImageOpened -= imageOpenedHandler;
+                            // 放入内存缓存。
+                            CacheBitmapImages[source] = bitmap;
+                            tcs.SetResult(new BitmapResult(bitmap));
+                        };
+                        bitmap.ImageOpened += imageOpenedHandler;
+                        ExceptionRoutedEventHandler imageFailedHandler = null;
+                        imageFailedHandler = (sender, e) =>
+                        {
+                            bitmap.ImageFailed -= imageFailedHandler;
+                            tcs.SetResult(new BitmapResult(e.ErrorMessage));
+                        };
+                        bitmap.ImageFailed += imageFailedHandler;
+                        bitmap.UriSource = new Uri(cacheFilePath, UriKind.Absolute);
+                        return await tcs.Task;
+                    }
+                    else
+                    {
+                        // TODO
+                        throw new NotImplementedException();
+                    }
                 }
                 else
                 {
-                    TaskCompletionSource<BitmapImage> tcs = new TaskCompletionSource<BitmapImage>();
+                    TaskCompletionSource<BitmapResult> tcs = new TaskCompletionSource<BitmapResult>();
                     bitmap = new BitmapImage();
                     RoutedEventHandler imageOpenedHandler = null;
                     imageOpenedHandler = (sender, e) =>
@@ -93,70 +133,19 @@ namespace Controls.Uwp
                         bitmap.ImageOpened -= imageOpenedHandler;
                         // 放入内存缓存。
                         CacheBitmapImages[source] = bitmap;
-                        tcs.SetResult(bitmap);
+                        tcs.SetResult(new BitmapResult(bitmap));
                     };
                     bitmap.ImageOpened += imageOpenedHandler;
                     ExceptionRoutedEventHandler imageFailedHandler = null;
                     imageFailedHandler = (sender, e) =>
                     {
                         bitmap.ImageFailed -= imageFailedHandler;
-                        tcs.SetResult(bitmap);
+                        tcs.SetResult(new BitmapResult(e.ErrorMessage));
                     };
                     bitmap.ImageFailed += imageFailedHandler;
                     bitmap.UriSource = uriSource;
                     return await tcs.Task;
                 }
-            }
-
-            throw new NotImplementedException();
-        }
-
-        private static Uri ToUriSource(string source)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            Uri uriSource;
-            if (Uri.TryCreate(source, UriKind.RelativeOrAbsolute, out uriSource))
-            {
-                if (uriSource.IsAbsoluteUri == false)
-                {
-                    Uri.TryCreate("ms-appx:///" + (source.StartsWith("/") ? source.Substring(1) : source),
-                        UriKind.Absolute, out uriSource);
-                }
-            }
-
-            if (uriSource == null)
-            {
-                throw new NotSupportedException();
-            }
-
-            return uriSource;
-        }
-
-        private async Task<byte[]> DownloadImageAsync(string source, Uri uriSource)
-        {
-            using (HttpClient client = new HttpClient())
-            {
-                byte[] bytes;
-                try
-                {
-                    var task = client.GetBufferAsync(uriSource);
-                    task.Progress = (asyncInfo, progressInfo) =>
-                    {
-                        // TODO
-                    };
-                    var buffer = await task;
-                    bytes = buffer.ToArray();
-                }
-                catch (Exception)
-                {
-                    bytes = null;
-                    // TODO image failed
-                }
-                return bytes;
             }
         }
 
@@ -226,9 +215,6 @@ namespace Controls.Uwp
             return Path.Combine(CacheFolderPath, cacheFileName);
         }
 
-        private static readonly string CacheFolderPath = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path,
-            CacheFolderName);
-
         private static bool IsHttpUri(Uri uri)
         {
             if (uri == null)
@@ -238,6 +224,54 @@ namespace Controls.Uwp
 
             var scheme = uri.Scheme;
             return uri.IsAbsoluteUri && (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase) || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static Uri ToUriSource(string source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            Uri uriSource;
+            if (Uri.TryCreate(source, UriKind.RelativeOrAbsolute, out uriSource))
+            {
+                if (uriSource.IsAbsoluteUri == false)
+                {
+                    Uri.TryCreate("ms-appx:///" + (source.StartsWith("/") ? source.Substring(1) : source), UriKind.Absolute, out uriSource);
+                }
+            }
+
+            if (uriSource == null)
+            {
+                throw new NotSupportedException();
+            }
+
+            return uriSource;
+        }
+
+        private async Task<byte[]> DownloadImageAsync(string source, Uri uriSource)
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                byte[] bytes;
+                try
+                {
+                    var task = client.GetBufferAsync(uriSource);
+                    task.Progress = (asyncInfo, progressInfo) =>
+                    {
+                        // TODO
+                    };
+                    var buffer = await task;
+                    bytes = buffer.ToArray();
+                }
+                catch (Exception)
+                {
+                    bytes = null;
+                    // TODO image failed
+                }
+                return bytes;
+            }
         }
     }
 }
