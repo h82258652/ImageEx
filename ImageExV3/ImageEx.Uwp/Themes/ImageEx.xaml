@@ -1,2 +1,31 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" />
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:Controls">
+    <Style TargetType="controls:ImageEx">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:ImageEx">
+                    <Grid Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}">
+                        <Image x:Name="PART_Image"
+                               NineGrid="{TemplateBinding NineGrid}"
+                               Stretch="{TemplateBinding Stretch}" />
+                        <ContentControl x:Name="PART_FailedContentControl"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        ContentTemplate="{TemplateBinding FailedTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding FailedTemplateSelector}"
+                                        Visibility="Collapsed" />
+                        <ContentControl x:Name="PART_LoadingContentControl"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        ContentTemplate="{TemplateBinding LoadingTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding LoadingTemplateSelector}"
+                                        Visibility="Collapsed" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

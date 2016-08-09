@@ -7,7 +7,7 @@
     <ProjectGuid>{AC5404FD-22FD-4F97-A3A2-B9D2CCD6006B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Controls.Uwp</RootNamespace>
+    <RootNamespace>Controls</RootNamespace>
     <AssemblyName>ImageEx.Uwp</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

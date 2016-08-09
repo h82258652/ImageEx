@@ -1,4 +1,4 @@
-﻿namespace Controls.Uwp
+﻿namespace Controls
 {
     public enum BitmapStatus
     {

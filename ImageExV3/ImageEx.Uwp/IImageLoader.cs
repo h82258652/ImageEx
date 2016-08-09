@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Controls.Uwp
+namespace Controls
 {
     public interface IImageLoader
     {

@@ -1,5 +1,5 @@
-﻿using Controls.Uwp.Extensions;
-using Controls.Uwp.Utils;
+﻿using Controls.Extensions;
+using Controls.Utils;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,7 +11,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Web.Http;
 
-namespace Controls.Uwp
+namespace Controls
 {
     public sealed class DefaultImageLoader : IImageLoader
     {

@@ -1,6 +1,6 @@
 ﻿using Windows.UI.Xaml.Media.Imaging;
 
-namespace Controls.Uwp
+namespace Controls
 {
     public class BitmapResult
     {

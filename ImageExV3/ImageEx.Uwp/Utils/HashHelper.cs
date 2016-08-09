@@ -2,7 +2,7 @@
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 
-namespace Controls.Uwp.Utils
+namespace Controls.Utils
 {
     public static class HashHelper
     {
