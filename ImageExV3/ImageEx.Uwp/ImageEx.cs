@@ -1,11 +1,16 @@
-﻿using Windows.Media.Casting;
+﻿using System;
+using Windows.ApplicationModel;
+using Windows.Media.Casting;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Controls
 {
     [TemplatePart(Name = ImageTemplateName, Type = typeof(Image))]
+    [TemplatePart(Name = FailedContentControlTemplateName, Type = typeof(ContentControl))]
+    [TemplatePart(Name = LoadingContentControlTemplateName, Type = typeof(ContentControl))]
     public class ImageEx : Control
     {
         public static readonly DependencyProperty FailedTemplateProperty = DependencyProperty.Register(nameof(FailedTemplate), typeof(DataTemplate), typeof(ImageEx), new PropertyMetadata(default(DataTemplate)));
@@ -28,7 +33,11 @@ namespace Controls
 
         private const string LoadingContentControlTemplateName = "PART_LoadingContentControl";
 
+        private ContentControl _failedContentControl;
+
         private Image _image;
+
+        private ContentControl _loadingContentControl;
 
         public ImageEx()
         {
@@ -130,11 +139,32 @@ namespace Controls
             base.OnApplyTemplate();
 
             _image = (Image)GetTemplateChild(ImageTemplateName);
+            _failedContentControl = (ContentControl)GetTemplateChild(FailedContentControlTemplateName);
+            _loadingContentControl = (ContentControl)GetTemplateChild(LoadingContentControlTemplateName);
+            SetSource(Source);
         }
 
         private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            var obj = (ImageEx)d;
+            var value = (string)e.NewValue;
+
+            obj.SetSource(value);
+        }
+
+        private async void SetSource(string source)
+        {
+            if (_image != null)
+            {
+                // 设计模式下直接显示。
+                if (DesignMode.DesignModeEnabled)
+                {
+                    _image.Source = source == null ? null : new BitmapImage(new Uri(source, UriKind.RelativeOrAbsolute));
+                }
+                else
+                {
+                }
+            }
         }
     }
 }
