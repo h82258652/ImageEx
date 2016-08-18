@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using Windows.ApplicationModel;
 using Windows.Media.Casting;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -156,6 +158,20 @@ namespace Controls
             obj.SetSource(value);
         }
 
+        public virtual IImageLoader Loader
+        {
+            get
+            {
+                if (_loader == null)
+                {
+                    _loader = DefaultImageLoader.Instance;
+                }
+                return _loader;
+            }
+        }
+
+        private IImageLoader _loader;
+
         private async void SetSource(string source)
         {
             if (_image != null)
@@ -167,6 +183,40 @@ namespace Controls
                 }
                 else
                 {
+                    if (source == null)
+                    {
+                        _image.Source = null;
+                        VisualStateManager.GoToState(this, "Normal", true);
+                    }
+                    else
+                    {
+                        VisualStateManager.GoToState(this, "Loading", true);
+                        var result = await Loader.GetBitmapAsync(source);
+                        if (source == Source)// 确保在执行异步操作过程中，Source 没有变动。
+                        {
+                            switch (result.Status)
+                            {
+                                case BitmapStatus.Unknown:
+                                    Debugger.Break();
+                                    throw new InvalidOperationException("Unknown bitmap state");
+                                    break;
+
+                                case BitmapStatus.Opened:
+                                    _image.Source = result.Value;
+                                    VisualStateManager.GoToState(this, "Opened", true);
+                                    break;
+
+                                case BitmapStatus.Failed:
+                                    _image.Source = result.Value;
+                                    VisualStateManager.GoToState(this, "Failed", true);
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+
                     // TODO
                 }
             }

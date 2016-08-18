@@ -6,7 +6,7 @@ namespace Controls
     {
         internal BitmapResult(BitmapImage bitmap)
         {
-            Result = bitmap;
+            Value = bitmap;
             Status = BitmapStatus.Opened;
         }
 
@@ -21,7 +21,7 @@ namespace Controls
             get;
         }
 
-        public BitmapImage Result
+        public BitmapImage Value
         {
             get;
         }
@@ -33,7 +33,7 @@ namespace Controls
 
         public static implicit operator BitmapImage(BitmapResult result)
         {
-            return result.Result;
+            return result.Value;
         }
     }
 }
