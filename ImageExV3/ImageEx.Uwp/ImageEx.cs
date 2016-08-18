@@ -11,6 +11,10 @@ namespace Controls
     [TemplatePart(Name = ImageTemplateName, Type = typeof(Image))]
     [TemplatePart(Name = FailedContentControlTemplateName, Type = typeof(ContentControl))]
     [TemplatePart(Name = LoadingContentControlTemplateName, Type = typeof(ContentControl))]
+    [TemplateVisualState(GroupName = "TODO", Name = "Normal")]
+    [TemplateVisualState(GroupName = "TODO", Name = "Opened")]
+    [TemplateVisualState(GroupName = "TODO", Name = "Failed")]
+    [TemplateVisualState(GroupName = "TODO", Name = "Loading")]
     public class ImageEx : Control
     {
         public static readonly DependencyProperty FailedTemplateProperty = DependencyProperty.Register(nameof(FailedTemplate), typeof(DataTemplate), typeof(ImageEx), new PropertyMetadata(default(DataTemplate)));
@@ -163,6 +167,7 @@ namespace Controls
                 }
                 else
                 {
+                    // TODO
                 }
             }
         }

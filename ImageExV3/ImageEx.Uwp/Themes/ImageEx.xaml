@@ -8,6 +8,14 @@
                     <Grid Background="{TemplateBinding Background}"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="ImageStates">
+                                <VisualState x:Name="Normal"></VisualState>
+                                <VisualState x:Name="Opened"></VisualState>
+                                <VisualState x:Name="Failed"></VisualState>
+                                <VisualState x:Name="Loading"></VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
                         <Image x:Name="PART_Image"
                                NineGrid="{TemplateBinding NineGrid}"
                                Stretch="{TemplateBinding Stretch}" />
