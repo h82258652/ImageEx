@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using Windows.ApplicationModel;
 using Windows.Media.Casting;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -13,10 +11,10 @@ namespace Controls
     [TemplatePart(Name = ImageTemplateName, Type = typeof(Image))]
     [TemplatePart(Name = FailedContentControlTemplateName, Type = typeof(ContentControl))]
     [TemplatePart(Name = LoadingContentControlTemplateName, Type = typeof(ContentControl))]
-    [TemplateVisualState(GroupName = "TODO", Name = "Normal")]
-    [TemplateVisualState(GroupName = "TODO", Name = "Opened")]
-    [TemplateVisualState(GroupName = "TODO", Name = "Failed")]
-    [TemplateVisualState(GroupName = "TODO", Name = "Loading")]
+    [TemplateVisualState(GroupName = "ImageStates", Name = "Normal")]
+    [TemplateVisualState(GroupName = "ImageStates", Name = "Opened")]
+    [TemplateVisualState(GroupName = "ImageStates", Name = "Failed")]
+    [TemplateVisualState(GroupName = "ImageStates", Name = "Loading")]
     public class ImageEx : Control
     {
         public static readonly DependencyProperty FailedTemplateProperty = DependencyProperty.Register(nameof(FailedTemplate), typeof(DataTemplate), typeof(ImageEx), new PropertyMetadata(default(DataTemplate)));
@@ -39,11 +37,9 @@ namespace Controls
 
         private const string LoadingContentControlTemplateName = "PART_LoadingContentControl";
 
-        private ContentControl _failedContentControl;
-
         private Image _image;
 
-        private ContentControl _loadingContentControl;
+        private IImageLoader _loader;
 
         public ImageEx()
         {
@@ -71,6 +67,15 @@ namespace Controls
             set
             {
                 SetValue(FailedTemplateSelectorProperty, value);
+            }
+        }
+
+        public virtual IImageLoader Loader
+        {
+            get
+            {
+                _loader = _loader ?? DefaultImageLoader.Instance;
+                return _loader;
             }
         }
 
@@ -145,8 +150,6 @@ namespace Controls
             base.OnApplyTemplate();
 
             _image = (Image)GetTemplateChild(ImageTemplateName);
-            _failedContentControl = (ContentControl)GetTemplateChild(FailedContentControlTemplateName);
-            _loadingContentControl = (ContentControl)GetTemplateChild(LoadingContentControlTemplateName);
             SetSource(Source);
         }
 
@@ -157,20 +160,6 @@ namespace Controls
 
             obj.SetSource(value);
         }
-
-        public virtual IImageLoader Loader
-        {
-            get
-            {
-                if (_loader == null)
-                {
-                    _loader = DefaultImageLoader.Instance;
-                }
-                return _loader;
-            }
-        }
-
-        private IImageLoader _loader;
 
         private async void SetSource(string source)
         {
@@ -196,11 +185,6 @@ namespace Controls
                         {
                             switch (result.Status)
                             {
-                                case BitmapStatus.Unknown:
-                                    Debugger.Break();
-                                    throw new InvalidOperationException("Unknown bitmap state");
-                                    break;
-
                                 case BitmapStatus.Opened:
                                     _image.Source = result.Value;
                                     VisualStateManager.GoToState(this, "Opened", true);
@@ -212,12 +196,10 @@ namespace Controls
                                     break;
 
                                 default:
-                                    break;
+                                    throw new ArgumentOutOfRangeException(nameof(result.Status));
                             }
                         }
                     }
-
-                    // TODO
                 }
             }
         }
