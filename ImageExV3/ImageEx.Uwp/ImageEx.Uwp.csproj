@@ -110,9 +110,11 @@
     <Compile Include="BitmapResult.cs" />
     <Compile Include="BitmapStatus.cs" />
     <Compile Include="DefaultImageLoader.cs" />
+    <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="IImageLoader.cs" />
     <Compile Include="ImageEx.cs" />
+    <Compile Include="ImageFailedEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\HashHelper.cs" />
     <EmbeddedResource Include="Properties\ImageEx.Uwp.rd.xml" />

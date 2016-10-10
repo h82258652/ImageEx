@@ -46,7 +46,7 @@ namespace Controls
             DefaultStyleKey = typeof(ImageEx);
         }
 
-        public event EventHandler ImageFailed;
+        public event EventHandler<ImageFailedEventArgs> ImageFailed;
 
         public event EventHandler ImageOpened;
 
@@ -198,7 +198,7 @@ namespace Controls
                                 case BitmapStatus.Failed:
                                     _image.Source = result.Value;
                                     VisualStateManager.GoToState(this, "Failed", true);
-                                    ImageFailed?.Invoke(this, EventArgs.Empty);
+                                    ImageFailed?.Invoke(this, new ImageFailedEventArgs(source, result.ErrorMessage));
                                     break;
 
                                 default:
