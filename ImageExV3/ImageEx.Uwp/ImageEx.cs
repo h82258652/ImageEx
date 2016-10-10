@@ -153,6 +153,10 @@ namespace Controls
             SetSource(Source);
         }
 
+        public event EventHandler ImageOpened;
+
+        public event EventHandler ImageFailed;
+
         private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var obj = (ImageEx)d;
@@ -188,11 +192,13 @@ namespace Controls
                                 case BitmapStatus.Opened:
                                     _image.Source = result.Value;
                                     VisualStateManager.GoToState(this, "Opened", true);
+                                    ImageOpened?.Invoke(this, EventArgs.Empty);
                                     break;
 
                                 case BitmapStatus.Failed:
                                     _image.Source = result.Value;
                                     VisualStateManager.GoToState(this, "Failed", true);
+                                    ImageFailed?.Invoke(this, EventArgs.Empty);
                                     break;
 
                                 default:
