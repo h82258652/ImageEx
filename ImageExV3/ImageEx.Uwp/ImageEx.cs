@@ -46,6 +46,10 @@ namespace Controls
             DefaultStyleKey = typeof(ImageEx);
         }
 
+        public event EventHandler ImageFailed;
+
+        public event EventHandler ImageOpened;
+
         public DataTemplate FailedTemplate
         {
             get
@@ -152,10 +156,6 @@ namespace Controls
             _image = (Image)GetTemplateChild(ImageTemplateName);
             SetSource(Source);
         }
-
-        public event EventHandler ImageOpened;
-
-        public event EventHandler ImageFailed;
 
         private static void SourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
