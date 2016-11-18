@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Controls
 {
@@ -154,7 +156,47 @@ namespace Controls
 
         private async void SetSource(string source)
         {
-            throw new NotImplementedException();
+            if (_image != null)
+            {
+                // 设计模式下直接显示。
+                if ((bool)DesignerProperties.IsInDesignModeProperty.GetMetadata(typeof(DependencyObject)).DefaultValue)
+                {
+                    _image.Source = source == null ? null : new BitmapImage(new Uri(source, UriKind.RelativeOrAbsolute));
+                }
+                else
+                {
+                    if (source == null)
+                    {
+                        _image.Source = null;
+                        VisualStateManager.GoToState(this, "Normal", true);
+                    }
+                    else
+                    {
+                        VisualStateManager.GoToState(this, "Loading", true);
+                        var result = await Loader.GetBitmapAsync(source);
+                        if (source == Source)// 确保在执行异步操作过程中，Source 没有变动。
+                        {
+                            switch (result.Status)
+                            {
+                                case BitmapStatus.Opened:
+                                    _image.Source = result.Value;
+                                    VisualStateManager.GoToState(this, "Opened", true);
+                                    ImageOpened?.Invoke(this, EventArgs.Empty);
+                                    break;
+
+                                case BitmapStatus.Failed:
+                                    _image.Source = result.Value;
+                                    VisualStateManager.GoToState(this, "Failed", true);
+                                    ImageFailed?.Invoke(this, new ImageFailedEventArgs(source, result.ErrorException));
+                                    break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException(nameof(result.Status));
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

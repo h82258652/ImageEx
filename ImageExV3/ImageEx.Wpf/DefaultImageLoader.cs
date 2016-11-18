@@ -1,12 +1,12 @@
 ﻿using Controls.Extensions;
 using Controls.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media.Imaging;
 using Weakly;
 
@@ -19,6 +19,8 @@ namespace Controls
         private static readonly WeakValueDictionary<string, BitmapImage> CacheBitmapImages = new WeakValueDictionary<string, BitmapImage>();
 
         private static readonly string CacheFolderPath = Path.Combine(Path.GetTempPath(), CacheFolderName);
+
+        private static readonly ConcurrentDictionary<string, Task<byte[]>> ImageDownloadTasks = new ConcurrentDictionary<string, Task<byte[]>>();
 
         private static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1);
 
@@ -74,6 +76,14 @@ namespace Controls
             }
         }
 
+        public async Task<byte[]> DownloadImageAsync(string source, Uri uriSource)
+        {
+            using (var client = new HttpClient())
+            {
+                return await client.GetByteArrayAsync(uriSource);
+            }
+        }
+
         public async Task<BitmapResult> GetBitmapAsync(string source)
         {
             if (source == null)
@@ -96,9 +106,88 @@ namespace Controls
                     var cacheFilePath = GetCacheFilePath(uriSource);
                     if (File.Exists(cacheFilePath))
                     {
-                        var tcs = new TaskCompletionSource<object>();
+                        await SemaphoreSlim.WaitAsync();
+                        try
+                        {
+                            bitmap = new BitmapImage();
+                            bitmap.BeginInit();
+                            bitmap.UriSource = new Uri(cacheFilePath);
+                            bitmap.EndInit();
+                            // 放入内存缓存。
+                            CacheBitmapImages[source] = bitmap;
+
+                            return new BitmapResult(bitmap);
+                        }
+                        catch (NotSupportedException ex)
+                        {
+                            return new BitmapResult(ex);
+                        }
+                        finally
+                        {
+                            await Task.Delay(1);
+                            SemaphoreSlim.Release();
+                        }
                     }
-                    throw new NotImplementedException();
+                    else
+                    {
+                        Task<byte[]> task;
+                        if (ImageDownloadTasks.TryGetValue(source, out task) == false)
+                        {
+                            task = DownloadImageAsync(source, uriSource);
+                            ImageDownloadTasks[source] = task;
+                        }
+
+                        byte[] bytes;
+                        try
+                        {
+                            bytes = await task;
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            ImageDownloadTasks.TryRemove(source, out task);
+                            return new BitmapResult(ex);
+                        }
+
+                        await SemaphoreSlim.WaitAsync();
+                        try
+                        {
+                            bitmap = new BitmapImage();
+                            bitmap.BeginInit();
+                            bitmap.StreamSource = new MemoryStream(bytes);
+                            bitmap.EndInit();
+                            // 放入内存缓存。
+                            CacheBitmapImages[source] = bitmap;
+
+                            Action asyncAction = async () =>
+                            {
+                                try
+                                {
+                                    await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
+                                }
+                                catch (Exception)
+                                {
+                                    // ignored
+                                }
+                                finally
+                                {
+                                    ImageDownloadTasks.TryRemove(source, out task);
+                                }
+                            };
+                            asyncAction.Invoke();
+
+                            return new BitmapResult(bitmap);
+                        }
+                        catch (NotSupportedException ex)
+                        {
+                            ImageDownloadTasks.TryRemove(source, out task);
+                            return new BitmapResult(ex);
+                        }
+                        finally
+                        {
+                            await Task.Delay(1);
+                            SemaphoreSlim.Release();
+                        }
+                    }
                 }
                 else
                 {
@@ -109,6 +198,9 @@ namespace Controls
                         bitmap.BeginInit();
                         bitmap.UriSource = uriSource;
                         bitmap.EndInit();
+                        // 放入内存缓存。
+                        CacheBitmapImages[source] = bitmap;
+
                         return new BitmapResult(bitmap);
                     }
                     catch (FileNotFoundException ex)
@@ -145,32 +237,59 @@ namespace Controls
                 }
                 else
                 {
-                    byte[] bytes;
-                    using (var client = new HttpClient())
+                    Task<byte[]> task;
+                    if (ImageDownloadTasks.TryGetValue(source, out task) == false)
                     {
-                        bytes = await client.GetByteArrayAsync(uriSource);
+                        task = DownloadImageAsync(source, uriSource);
+                        ImageDownloadTasks[source] = task;
                     }
 
+                    byte[] bytes;
                     try
                     {
-                        var bitmap = new BitmapImage();
-                        bitmap.BeginInit();
-                        bitmap.StreamSource = new MemoryStream(bytes);
-                        bitmap.EndInit();
+                        bytes = await task;
                     }
-                    catch (Exception)
+                    catch (HttpRequestException)
                     {
-                        throw new NotImplementedException();
+                        ImageDownloadTasks.TryRemove(source, out task);
+                        throw;
                     }
+
+                    Action asyncAction = async () =>
+                    {
+                        await SemaphoreSlim.WaitAsync();
+                        try
+                        {
+                            var bitmap = new BitmapImage();
+                            bitmap.BeginInit();
+                            bitmap.StreamSource = new MemoryStream(bytes);
+                            bitmap.EndInit();
+                            CacheBitmapImages[source] = bitmap;
+                            try
+                            {
+                                await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
+                            }
+                            catch (Exception)
+                            {
+                                // ignored
+                            }
+                        }
+                        finally
+                        {
+                            ImageDownloadTasks.TryRemove(source, out task);
+                            await Task.Delay(1);
+                            SemaphoreSlim.Release();
+                        }
+                    };
+                    asyncAction.Invoke();
 
                     return bytes;
                 }
             }
             else
             {
+                return await FileExtensions.ReadAllBytesAsync(source);
             }
-
-            throw new NotImplementedException();
         }
 
         private static string GetCacheFilePath(Uri uriSource)

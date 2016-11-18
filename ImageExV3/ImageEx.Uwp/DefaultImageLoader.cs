@@ -104,6 +104,8 @@ namespace Controls
                         {
                             bitmap.ImageOpened -= imageOpenedHandler;
                             bitmap.ImageFailed -= imageFailedHandler;
+                            imageOpenedHandler = null;
+                            imageFailedHandler = null;
                             // 放入内存缓存。
                             CacheBitmapImages[source] = bitmap;
                             tcs.SetResult(new BitmapResult(bitmap));
@@ -112,6 +114,8 @@ namespace Controls
                         {
                             bitmap.ImageOpened -= imageOpenedHandler;
                             bitmap.ImageFailed -= imageFailedHandler;
+                            imageOpenedHandler = null;
+                            imageFailedHandler = null;
                             tcs.SetResult(new BitmapResult(e.ErrorMessage));
                         };
                         bitmap.ImageOpened += imageOpenedHandler;
@@ -135,6 +139,8 @@ namespace Controls
                         {
                             bitmap.ImageOpened -= imageOpenedHandler;
                             bitmap.ImageFailed -= imageFailedHandler;
+                            imageOpenedHandler = null;
+                            imageFailedHandler = null;
                             // 放入内存缓存。
                             CacheBitmapImages[source] = bitmap;
                             tcs.SetResult(new BitmapResult(bitmap));
@@ -144,6 +150,8 @@ namespace Controls
                         {
                             bitmap.ImageOpened -= imageOpenedHandler;
                             bitmap.ImageFailed -= imageFailedHandler;
+                            imageOpenedHandler = null;
+                            imageFailedHandler = null;
                             tcs.SetResult(new BitmapResult(e.ErrorMessage));
                         };
                         bitmap.ImageOpened += imageOpenedHandler;
@@ -162,6 +170,8 @@ namespace Controls
                     {
                         bitmap.ImageOpened -= imageOpenedHandler;
                         bitmap.ImageFailed -= imageFailedHandler;
+                        imageOpenedHandler = null;
+                        imageFailedHandler = null;
                         // 放入内存缓存。
                         CacheBitmapImages[source] = bitmap;
                         tcs.SetResult(new BitmapResult(bitmap));
@@ -170,6 +180,8 @@ namespace Controls
                     {
                         bitmap.ImageOpened -= imageOpenedHandler;
                         bitmap.ImageFailed -= imageFailedHandler;
+                        imageOpenedHandler = null;
+                        imageFailedHandler = null;
                         tcs.SetResult(new BitmapResult(e.ErrorMessage));
                     };
                     bitmap.ImageOpened += imageOpenedHandler;
