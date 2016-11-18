@@ -194,7 +194,7 @@ namespace Controls
             }
 
             var scheme = uri.Scheme;
-            return uri.IsAbsoluteUri && (string.Equals(scheme, "http", StringComparison.OrdinalIgnoreCase) || string.Equals(scheme, "https", StringComparison.OrdinalIgnoreCase));
+            return uri.IsAbsoluteUri && (string.Equals(scheme, Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) || string.Equals(scheme, Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase));
         }
 
         private static Uri ToUriSource(string source)
