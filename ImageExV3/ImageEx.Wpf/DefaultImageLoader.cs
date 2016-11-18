@@ -76,14 +76,6 @@ namespace Controls
             }
         }
 
-        public async Task<byte[]> DownloadImageAsync(string source, Uri uriSource)
-        {
-            using (var client = new HttpClient())
-            {
-                return await client.GetByteArrayAsync(uriSource);
-            }
-        }
-
         public async Task<BitmapResult> GetBitmapAsync(string source)
         {
             if (source == null)
@@ -133,7 +125,7 @@ namespace Controls
                         Task<byte[]> task;
                         if (ImageDownloadTasks.TryGetValue(source, out task) == false)
                         {
-                            task = DownloadImageAsync(source, uriSource);
+                            task = DownloadImageAsync(uriSource);
                             ImageDownloadTasks[source] = task;
                         }
 
@@ -240,7 +232,7 @@ namespace Controls
                     Task<byte[]> task;
                     if (ImageDownloadTasks.TryGetValue(source, out task) == false)
                     {
-                        task = DownloadImageAsync(source, uriSource);
+                        task = DownloadImageAsync(uriSource);
                         ImageDownloadTasks[source] = task;
                     }
 
@@ -338,6 +330,14 @@ namespace Controls
             }
 
             return uriSource;
+        }
+
+        private async Task<byte[]> DownloadImageAsync(Uri uriSource)
+        {
+            using (var client = new HttpClient())
+            {
+                return await client.GetByteArrayAsync(uriSource);
+            }
         }
     }
 }

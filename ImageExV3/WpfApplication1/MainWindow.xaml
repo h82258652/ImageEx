@@ -14,10 +14,13 @@
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemTemplate>
                 <DataTemplate>
+                    <!--<Image Width="100"
+                           Height="100"
+                           Source="{Binding}"
+                           Stretch="None" />-->
                     <controls:ImageEx Width="100"
                                       Height="100"
-                                      Source="{Binding}"
-                                      Stretch="None">
+                                      Source="{Binding}">
                         <controls:ImageEx.LoadingTemplate>
                             <DataTemplate>
                                 <Grid Background="Green" />

@@ -1,6 +1,7 @@
 ﻿using Controls.Extensions;
 using Controls.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -19,8 +20,9 @@ namespace Controls
 
         private static readonly WeakValueDictionary<string, BitmapImage> CacheBitmapImages = new WeakValueDictionary<string, BitmapImage>();
 
-        private static readonly string CacheFolderPath = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path,
-            CacheFolderName);
+        private static readonly string CacheFolderPath = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, CacheFolderName);
+
+        private static readonly ConcurrentDictionary<string, Task<byte[]>> ImageDownloadTasks = new ConcurrentDictionary<string, Task<byte[]>>();
 
         private DefaultImageLoader()
         {
@@ -125,10 +127,22 @@ namespace Controls
                     }
                     else
                     {
-                        byte[] bytes;
-                        using (var client = new HttpClient())
+                        Task<byte[]> task;
+                        if (ImageDownloadTasks.TryGetValue(source, out task) == false)
                         {
-                            bytes = await client.GetByteArrayAsync(uriSource);
+                            task = DownloadImageAsync(uriSource);
+                            ImageDownloadTasks[source] = task;
+                        }
+
+                        byte[] bytes;
+                        try
+                        {
+                            bytes = await task;
+                        }
+                        catch (HttpRequestException ex)
+                        {
+                            ImageDownloadTasks.TryRemove(source, out task);
+                            return new BitmapResult(ex.Message);
                         }
 
                         var tcs = new TaskCompletionSource<BitmapResult>();
@@ -144,7 +158,18 @@ namespace Controls
                             // 放入内存缓存。
                             CacheBitmapImages[source] = bitmap;
                             tcs.SetResult(new BitmapResult(bitmap));
-                            await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
+                            try
+                            {
+                                await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
+                            }
+                            catch (Exception)
+                            {
+                                // ignored
+                            }
+                            finally
+                            {
+                                ImageDownloadTasks.TryRemove(source, out task);
+                            }
                         };
                         imageFailedHandler = (sender, e) =>
                         {
@@ -153,6 +178,7 @@ namespace Controls
                             imageOpenedHandler = null;
                             imageFailedHandler = null;
                             tcs.SetResult(new BitmapResult(e.ErrorMessage));
+                            ImageDownloadTasks.TryRemove(source, out task);
                         };
                         bitmap.ImageOpened += imageOpenedHandler;
                         bitmap.ImageFailed += imageFailedHandler;
@@ -297,6 +323,14 @@ namespace Controls
             }
 
             return uriSource;
+        }
+
+        private async Task<byte[]> DownloadImageAsync(Uri uriSource)
+        {
+            using (var client = new HttpClient())
+            {
+                return await client.GetByteArrayAsync(uriSource);
+            }
         }
     }
 }
