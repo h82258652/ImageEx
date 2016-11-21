@@ -154,6 +154,7 @@ namespace Controls
                             {
                                 try
                                 {
+                                    Directory.CreateDirectory(Path.GetDirectoryName(cacheFilePath));
                                     await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
                                 }
                                 catch (Exception)
@@ -259,6 +260,7 @@ namespace Controls
                             CacheBitmapImages[source] = bitmap;
                             try
                             {
+                                Directory.CreateDirectory(Path.GetDirectoryName(cacheFilePath));
                                 await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
                             }
                             catch (Exception)
