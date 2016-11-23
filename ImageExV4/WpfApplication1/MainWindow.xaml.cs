@@ -1,6 +1,7 @@
 ﻿using BingoWallpaper.Models;
 using BingoWallpaper.Services;
 using Controls;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -36,7 +37,8 @@ namespace WpfApplication1
                 //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
                 //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
             }
-            collection = new ObservableCollection<string>(collection.OrderBy(temp => temp.GetHashCode()));
+            var random = new Random();
+            collection = new ObservableCollection<string>(collection.OrderBy(temp => random.Next()));
             ListView.ItemsSource = collection;
         }
 

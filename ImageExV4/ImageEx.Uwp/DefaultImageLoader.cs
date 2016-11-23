@@ -104,32 +104,20 @@ namespace Controls
                     var cacheFilePath = GetCacheFilePath(uriSource);
                     if (File.Exists(cacheFilePath))
                     {
-                        var tcs = new TaskCompletionSource<BitmapResult>();
+                        var bytes = await FileExtensions.ReadAllBytesAsync(cacheFilePath);
                         bitmap = new BitmapImage();
-                        RoutedEventHandler imageOpenedHandler = null;
-                        ExceptionRoutedEventHandler imageFailedHandler = null;
-                        imageOpenedHandler = (sender, e) =>
+                        try
                         {
-                            bitmap.ImageOpened -= imageOpenedHandler;
-                            bitmap.ImageFailed -= imageFailedHandler;
-                            imageOpenedHandler = null;
-                            imageFailedHandler = null;
+                            await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
                             // 放入内存缓存。
                             CacheBitmapImages[source] = bitmap;
-                            tcs.SetResult(new BitmapResult(bitmap));
-                        };
-                        imageFailedHandler = (sender, e) =>
+
+                            return new BitmapResult(bitmap);
+                        }
+                        catch (Exception ex)
                         {
-                            bitmap.ImageOpened -= imageOpenedHandler;
-                            bitmap.ImageFailed -= imageFailedHandler;
-                            imageOpenedHandler = null;
-                            imageFailedHandler = null;
-                            tcs.SetResult(new BitmapResult(e.ErrorMessage));
-                        };
-                        bitmap.ImageOpened += imageOpenedHandler;
-                        bitmap.ImageFailed += imageFailedHandler;
-                        bitmap.UriSource = new Uri(cacheFilePath, UriKind.Absolute);
-                        return await tcs.Task;
+                            return new BitmapResult(ex.Message);
+                        }
                     }
                     else
                     {
@@ -151,76 +139,76 @@ namespace Controls
                             return new BitmapResult(ex.Message);
                         }
 
-                        TaskCompletionSource<BitmapResult> tcs = new TaskCompletionSource<BitmapResult>();
                         bitmap = new BitmapImage();
-                        RoutedEventHandler imageOpenedHandler = null;
-                        ExceptionRoutedEventHandler imageFailedHandler = null;
-                        imageOpenedHandler = async (sender, e) =>
+                        try
                         {
-                            bitmap.ImageOpened -= imageOpenedHandler;
-                            bitmap.ImageFailed -= imageFailedHandler;
-                            imageOpenedHandler = null;
-                            imageFailedHandler = null;
+                            await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
                             // 放入内存缓存。
                             CacheBitmapImages[source] = bitmap;
-                            tcs.SetResult(new BitmapResult(bitmap));
-                            try
+
+                            Action asyncAction = async () =>
                             {
-                                Directory.CreateDirectory(CacheFolderPath);
-                                await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
-                            }
-                            catch (Exception)
-                            {
-                                // ignored
-                            }
-                            finally
-                            {
-                                ImageDownloadTasks.TryRemove(source, out imageDownloadTask);
-                            }
-                        };
-                        imageFailedHandler = (sender, e) =>
+                                try
+                                {
+                                    Directory.CreateDirectory(CacheFolderPath);
+                                    await FileExtensions.WriteAllBytesAsync(cacheFilePath, bytes);
+                                }
+                                catch (Exception)
+                                {
+                                    // ignored
+                                }
+                                finally
+                                {
+                                    ImageDownloadTasks.TryRemove(source, out imageDownloadTask);
+                                }
+                            };
+                            asyncAction.Invoke();
+
+                            return new BitmapResult(bitmap);
+                        }
+                        catch (Exception ex)
                         {
-                            bitmap.ImageOpened -= imageOpenedHandler;
-                            bitmap.ImageFailed -= imageFailedHandler;
-                            imageOpenedHandler = null;
-                            imageFailedHandler = null;
-                            tcs.SetResult(new BitmapResult(e.ErrorMessage));
                             ImageDownloadTasks.TryRemove(source, out imageDownloadTask);
-                        };
-                        bitmap.ImageOpened += imageOpenedHandler;
-                        bitmap.ImageFailed += imageFailedHandler;
-                        await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
-                        return await tcs.Task;
+                            return new BitmapResult(ex.Message);
+                        }
                     }
                 }
                 else
                 {
-                    TaskCompletionSource<BitmapResult> tcs = new TaskCompletionSource<BitmapResult>();
-                    bitmap = new BitmapImage();
-                    RoutedEventHandler imageOpenedHandler = null;
-                    ExceptionRoutedEventHandler imageFailedHandler = null;
-                    imageOpenedHandler = (sender, e) =>
+                    byte[] bytes;
+                    try
                     {
-                        bitmap.ImageOpened -= imageOpenedHandler;
-                        bitmap.ImageFailed -= imageFailedHandler;
-                        imageOpenedHandler = null;
-                        imageFailedHandler = null;
+                        if (string.Equals(uriSource.Scheme, FileScheme, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // 绝对路径。
+                            bytes = await FileExtensions.ReadAllBytesAsync(source);
+                        }
+                        else
+                        {
+                            // ms-appx 或 ms-appdata，其它路径不支持。
+                            var file = await StorageFile.GetFileFromApplicationUriAsync(uriSource);
+                            var buffer = await FileIO.ReadBufferAsync(file);
+                            bytes = buffer.ToArray();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return new BitmapResult(ex.Message);
+                    }
+
+                    bitmap = new BitmapImage();
+                    try
+                    {
+                        await bitmap.SetSourceAsync(new MemoryStream(bytes).AsRandomAccessStream());
                         // 放入内存缓存。
                         CacheBitmapImages[source] = bitmap;
-                        tcs.SetResult(new BitmapResult(bitmap));
-                    };
-                    imageFailedHandler = (sender, e) =>
+
+                        return new BitmapResult(bitmap);
+                    }
+                    catch (Exception ex)
                     {
-                        bitmap.ImageOpened -= imageOpenedHandler;
-                        bitmap.ImageFailed -= imageFailedHandler;
-                        imageOpenedHandler = null;
-                        imageFailedHandler = null;
-                        tcs.SetResult(new BitmapResult(e.ErrorMessage));
-                    };
-                    bitmap.ImageOpened += imageOpenedHandler;
-                    bitmap.ImageFailed += imageFailedHandler;
-                    bitmap.UriSource = uriSource;
-                    return await tcs.Task;
+                        return new BitmapResult(ex.Message);
+                    }
                 }
             }
         }

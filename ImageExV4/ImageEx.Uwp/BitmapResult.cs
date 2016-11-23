@@ -1,11 +1,11 @@
 ﻿using System;
-using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Media;
 
 namespace Controls
 {
     public sealed class BitmapResult
     {
-        internal BitmapResult(BitmapImage bitmap)
+        public BitmapResult(ImageSource bitmap)
         {
             if (bitmap == null)
             {
@@ -16,7 +16,7 @@ namespace Controls
             Status = BitmapStatus.Opened;
         }
 
-        internal BitmapResult(string failedMessage)
+        public BitmapResult(string failedMessage)
         {
             if (failedMessage == null)
             {
@@ -37,7 +37,7 @@ namespace Controls
             get;
         }
 
-        public BitmapImage Value
+        public ImageSource Value
         {
             get;
         }
