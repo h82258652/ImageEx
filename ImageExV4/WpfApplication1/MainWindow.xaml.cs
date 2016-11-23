@@ -26,11 +26,12 @@ namespace WpfApplication1
             var size = new WallpaperSize(1920, 1080);
             foreach (var wallpaper in result)
             {
-                collection.Add(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                collection.Add(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                collection.Add(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                collection.Add(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                collection.Add(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
+                var url = leanCloudWallpaperService.GetUrl(wallpaper.Image, size);
+                collection.Add(url);
+                collection.Add(url);
+                collection.Add(url);
+                collection.Add(url);
+                collection.Add(url);
                 //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
                 //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
                 //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
