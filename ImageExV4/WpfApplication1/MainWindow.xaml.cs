@@ -4,6 +4,7 @@ using Controls;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace WpfApplication1
@@ -23,29 +24,17 @@ namespace WpfApplication1
             var collection = new ObservableCollection<string>();
             var leanCloudWallpaperService = new LeanCloudWallpaperService();
             var result = await leanCloudWallpaperService.GetWallpapersAsync(2016, 10, "zh-CN");
-            var size = new WallpaperSize(1920, 1080);
+            var size = new WallpaperSize(800, 480);
             foreach (var wallpaper in result)
             {
                 var url = leanCloudWallpaperService.GetUrl(wallpaper.Image, size);
-                collection.Add(url);
-                collection.Add(url);
-                collection.Add(url);
-                collection.Add(url);
-                collection.Add(url);
-                //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
-                //Download(leanCloudWallpaperService.GetUrl(wallpaper.Image, size));
+                GetBitmap(url);
             }
-            var random = new Random();
-            collection = new ObservableCollection<string>(collection.OrderBy(temp => random.Next()));
-            ListView.ItemsSource = collection;
         }
 
-        private async void Download(string url)
+        private async void GetBitmap(string source)
         {
-            await DefaultImageLoader.Instance.GetBytesAsync(url);
+            await DefaultImageLoader.Instance.GetBitmapAsync(source);
         }
     }
 }
