@@ -116,7 +116,7 @@ namespace Controls
                         }
                         finally
                         {
-                            await Task.Delay(1);
+                            await Task.Delay(1);// 防止同时加载大量图片时，UI 线程卡死。
                             SemaphoreSlim.Release();
                         }
                     }
@@ -177,7 +177,7 @@ namespace Controls
                         }
                         finally
                         {
-                            await Task.Delay(1);
+                            await Task.Delay(1);// 防止同时加载大量图片时，UI 线程卡死。
                             SemaphoreSlim.Release();
                         }
                     }
