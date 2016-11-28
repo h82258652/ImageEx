@@ -16,18 +16,18 @@ namespace Controls
             Status = BitmapStatus.Opened;
         }
 
-        public BitmapResult(string failedMessage)
+        public BitmapResult(Exception failedException)
         {
-            if (failedMessage == null)
+            if (failedException == null)
             {
-                throw new ArgumentNullException(nameof(failedMessage));
+                throw new ArgumentNullException(nameof(failedException));
             }
 
-            FailedMessage = failedMessage;
+            FailedException = failedException;
             Status = BitmapStatus.Failed;
         }
 
-        public string FailedMessage
+        public Exception FailedException
         {
             get;
         }

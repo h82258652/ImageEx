@@ -116,7 +116,7 @@ namespace Controls
                         }
                         catch (Exception ex)
                         {
-                            return new BitmapResult(ex.Message);
+                            return new BitmapResult(ex);
                         }
                     }
                     else
@@ -136,7 +136,7 @@ namespace Controls
                         catch (HttpRequestException ex)
                         {
                             ImageDownloadTasks.TryRemove(source, out imageDownloadTask);
-                            return new BitmapResult(ex.Message);
+                            return new BitmapResult(ex);
                         }
 
                         bitmap = new BitmapImage();
@@ -169,7 +169,7 @@ namespace Controls
                         catch (Exception ex)
                         {
                             ImageDownloadTasks.TryRemove(source, out imageDownloadTask);
-                            return new BitmapResult(ex.Message);
+                            return new BitmapResult(ex);
                         }
                     }
                 }
@@ -193,7 +193,7 @@ namespace Controls
                     }
                     catch (Exception ex)
                     {
-                        return new BitmapResult(ex.Message);
+                        return new BitmapResult(ex);
                     }
 
                     bitmap = new BitmapImage();
@@ -207,7 +207,7 @@ namespace Controls
                     }
                     catch (Exception ex)
                     {
-                        return new BitmapResult(ex.Message);
+                        return new BitmapResult(ex);
                     }
                 }
             }

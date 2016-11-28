@@ -4,17 +4,17 @@ namespace Controls
 {
     public class ExceptionEventArgs : EventArgs
     {
-        internal ExceptionEventArgs(string errorMessage)
+        internal ExceptionEventArgs(Exception exception)
         {
-            if (errorMessage == null)
+            if (exception == null)
             {
-                throw new ArgumentNullException(nameof(errorMessage));
+                throw new ArgumentNullException(nameof(exception));
             }
 
-            ErrorMessage = errorMessage;
+            Exception = exception;
         }
 
-        public string ErrorMessage
+        public Exception Exception
         {
             get;
         }

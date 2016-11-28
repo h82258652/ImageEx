@@ -208,7 +208,7 @@ namespace Controls
                                 case BitmapStatus.Failed:
                                     _image.Source = null;
                                     VisualStateManager.GoToState(this, FailedStateName, true);
-                                    ImageFailed?.Invoke(this, new ImageFailedEventArgs(source, result.FailedMessage));
+                                    ImageFailed?.Invoke(this, new ImageFailedEventArgs(source, result.FailedException));
                                     break;
 
                                 default:
