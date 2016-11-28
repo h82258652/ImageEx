@@ -200,6 +200,10 @@ namespace Controls
                     {
                         return new BitmapResult(ex);
                     }
+                    catch (IOException ex)
+                    {
+                        return new BitmapResult(ex);
+                    }
                     catch (NotSupportedException ex)
                     {
                         return new BitmapResult(ex);

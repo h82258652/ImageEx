@@ -17,7 +17,7 @@
                 <DataTemplate>
                     <controls:ImageEx Width="100"
                                       Height="100"
-                                      Source="/feedback_title.png">
+                                      Source="/feedback_title2.png">
                         <controls:ImageEx.LoadingTemplate>
                             <DataTemplate>
                                 <Grid Background="Green" />
@@ -25,7 +25,8 @@
                         </controls:ImageEx.LoadingTemplate>
                         <controls:ImageEx.FailedTemplate>
                             <DataTemplate>
-                                <local:LoadingControl />
+                                <Button Content="Reload"
+                                        Click="ButtonBase_OnClick"></Button>
                             </DataTemplate>
                         </controls:ImageEx.FailedTemplate>
                     </controls:ImageEx>
@@ -37,6 +38,6 @@
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
-        <local:LoadingControl></local:LoadingControl>
+        <!--<local:LoadingControl></local:LoadingControl>-->
     </Grid>
 </Window>

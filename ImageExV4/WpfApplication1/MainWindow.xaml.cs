@@ -3,6 +3,7 @@ using BingoWallpaper.Services;
 using Controls;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,13 +29,19 @@ namespace WpfApplication1
             foreach (var wallpaper in result)
             {
                 var url = leanCloudWallpaperService.GetUrl(wallpaper.Image, size);
-                GetBitmap(url);
+                collection.Add(url);
             }
+            ListView.ItemsSource = collection;
         }
 
         private async void GetBitmap(string source)
         {
             await DefaultImageLoader.Instance.GetBitmapAsync(source);
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            Debugger.Break();
         }
     }
 }
