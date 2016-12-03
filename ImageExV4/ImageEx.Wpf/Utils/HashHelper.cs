@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -14,15 +13,11 @@ namespace Controls.Utils
                 throw new ArgumentNullException(nameof(input));
             }
 
-            using (var md5 = new MD5CryptoServiceProvider())
+            using (var md5 = MD5.Create())
             {
-                var bytes = md5.ComputeHash(Encoding.UTF8.GetBytes(prefix + input + suffix));
-                var buffer = new StringBuilder();
-                foreach (var b in bytes)
-                {
-                    buffer.Append(b.ToString("x2", CultureInfo.InvariantCulture));
-                }
-                return buffer.ToString();
+                var buffer = Encoding.UTF8.GetBytes(prefix + input + suffix);
+                var hashResult = md5.ComputeHash(buffer);
+                return BitConverter.ToString(hashResult).Replace("-", string.Empty);
             }
         }
     }
