@@ -19,7 +19,7 @@
                     <ImageBrush Stretch="Uniform">
                         <i:Interaction.Behaviors>
                             <controls:ImageExBehavior ImageFailed="ImageExBehavior_OnImageFailed"
-                                                      Source="http://az29176.vo.msecnd.net/videocontent/HongKong_crossroad_FF_768_HD_ZH-CN862801601.jpg" />
+                                                      Source="http://az29176.vo.msecnd.net/videocontent/HongKong_crossroad_FF_768_HD_ZH-CN86280160.jpg" />
                         </i:Interaction.Behaviors>
                     </ImageBrush>
                 </Ellipse.Fill>
