@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Interactivity;
 using System.Windows.Media;
 
 namespace WpfApplication1
@@ -23,19 +24,6 @@ namespace WpfApplication1
 
         private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ListView.ItemsSource = Enumerable.Range(0, 111);
-            return;
-
-            var collection = new ObservableCollection<string>();
-            var leanCloudWallpaperService = new LeanCloudWallpaperService();
-            var result = await leanCloudWallpaperService.GetWallpapersAsync(2016, 10, "zh-CN");
-            var size = new WallpaperSize(800, 480);
-            foreach (var wallpaper in result)
-            {
-                var url = leanCloudWallpaperService.GetUrl(wallpaper.Image, size);
-                collection.Add(url);
-            }
-            ListView.ItemsSource = collection;
         }
 
         private async void GetBitmap(string source)
@@ -68,6 +56,11 @@ namespace WpfApplication1
             {
                 MessageBox.Show("null");
             }
+        }
+
+        private void ImageExBehavior_OnImageFailed(object sender, ImageFailedEventArgs e)
+        {
+            MessageBox.Show(e.Exception.ToString());
         }
     }
 }

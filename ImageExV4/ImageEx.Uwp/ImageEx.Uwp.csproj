@@ -114,6 +114,7 @@
     <Compile Include="Extensions\FileExtensions.cs" />
     <Compile Include="IImageLoader.cs" />
     <Compile Include="ImageEx.cs" />
+    <Compile Include="ImageExBehavior.cs" />
     <Compile Include="ImageFailedEventArgs.cs" />
     <Compile Include="ImageFailedEventHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

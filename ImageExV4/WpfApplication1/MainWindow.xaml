@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Controls;assembly=ImageEx.Wpf"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:WpfApplication1"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="MainWindow"
@@ -11,33 +12,18 @@
         Loaded="MainWindow_Loaded"
         mc:Ignorable="d">
     <Grid>
-        <ListView x:Name="ListView"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <controls:ImageEx Width="100"
-                                      Height="100"
-                                      Source="/feedback_title2.png">
-                        <controls:ImageEx.LoadingTemplate>
-                            <DataTemplate>
-                                <Grid Background="Green" />
-                            </DataTemplate>
-                        </controls:ImageEx.LoadingTemplate>
-                        <controls:ImageEx.FailedTemplate>
-                            <DataTemplate>
-                                <Button Content="Reload"
-                                        Click="ButtonBase_OnClick"></Button>
-                            </DataTemplate>
-                        </controls:ImageEx.FailedTemplate>
-                    </controls:ImageEx>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-        </ListView>
-        <!--<local:LoadingControl></local:LoadingControl>-->
+        <Grid Width="100"
+              Height="100">
+            <Ellipse>
+                <Ellipse.Fill>
+                    <ImageBrush Stretch="Uniform">
+                        <i:Interaction.Behaviors>
+                            <controls:ImageExBehavior ImageFailed="ImageExBehavior_OnImageFailed"
+                                                      Source="http://az29176.vo.msecnd.net/videocontent/HongKong_crossroad_FF_768_HD_ZH-CN862801601.jpg" />
+                        </i:Interaction.Behaviors>
+                    </ImageBrush>
+                </Ellipse.Fill>
+            </Ellipse>
+        </Grid>
     </Grid>
 </Window>
