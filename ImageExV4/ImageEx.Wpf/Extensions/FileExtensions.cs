@@ -43,7 +43,7 @@ namespace Controls.Extensions
                 throw new ArgumentNullException(nameof(bytes));
             }
 
-            using (var fs = File.OpenWrite(path))
+            using (var fs = File.Create(path))
             {
                 await fs.WriteAsync(bytes, 0, bytes.Length, cancellationToken);
             }
