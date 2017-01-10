@@ -51,12 +51,15 @@ namespace Controls
             return File.Exists(cacheFilePath);
         }
 
-        public void DeleteAllCache()
+        public async Task DeleteAllCacheAsync()
         {
-            Directory.Delete(CacheFolderPath, true);
+            await Task.Run(() =>
+            {
+                Directory.Delete(CacheFolderPath, true);
+            });
         }
 
-        public bool DeleteCache(string source)
+        public async Task<bool> DeleteCacheAsync(string source)
         {
             if (source == null)
             {
@@ -67,7 +70,10 @@ namespace Controls
             var cacheFilePath = GetCacheFilePath(uriSource);
             if (File.Exists(cacheFilePath))
             {
-                File.Delete(cacheFilePath);
+                await Task.Run(() =>
+                {
+                    File.Delete(cacheFilePath);
+                });
                 return true;
             }
             else

@@ -8,9 +8,9 @@ namespace Controls
 
         bool ContainsCache(string source);
 
-        void DeleteAllCache();
+        Task DeleteAllCacheAsync();
 
-        bool DeleteCache(string source);
+        Task<bool> DeleteCacheAsync(string source);
 
         Task<BitmapResult> GetBitmapAsync(string source);
 
